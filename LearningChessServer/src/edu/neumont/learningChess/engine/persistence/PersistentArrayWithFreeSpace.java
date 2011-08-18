@@ -1,24 +1,41 @@
 package edu.neumont.learningChess.engine.persistence;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public class PersistentArrayWithFreeSpace {
 	
 	private PersistentArray persistentArray;
-	private PersistentFreeSpaceHeader freeSpace;
+	private PersistentArrayWithFreeSpaceHeader header;
 	private static final long LONG_SIZE = 8;
 	private static final long END_OF_LIST = -1;
 	
+
+	private PersistentArrayWithFreeSpace(String fileName){
+		persistentArray = PersistentArray.open(fileName);
+		getLocalHeader();
+	}
+	
 	public static void create(String fileName, long recordSize, long headerSize, byte[] buffer){
 		try {
-			PersistentArray.create(fileName, recordSize, headerSize + LONG_SIZE);
+			PersistentArrayWithFreeSpaceHeader persistentArrayWithFreeSpaceHeader = new PersistentArrayWithFreeSpaceHeader(END_OF_LIST,buffer);
+			PersistentArray.create(fileName, recordSize, persistentArrayWithFreeSpaceHeader.getSize());
 			PersistentArray array = PersistentArray.open(fileName);
-			byte[] headerBuffer = new PersistentFreeSpaceHeader(END_OF_LIST,buffer).getSerializedFreeSpaceHeader();
-			array.putHeader(headerBuffer);
+			array.putHeader(persistentArrayWithFreeSpaceHeader.getSerializedFreeSpaceHeader());
 			array.close();
 		} catch (Throwable e) {
 			throw new RuntimeException("The persistent array, " + fileName +", could not be created", e);
 		}
+	}
+	
+	private void getLocalHeader() {
+		byte[] buffer = this.persistentArray.getHeader();
+		header = new PersistentArrayWithFreeSpaceHeader(buffer);
+	}
+	
+	private void putLocalHeader() {
+		byte[] buffer = header.getSerializedFreeSpaceHeader();
+		this.persistentArray.putHeader(buffer);
 	}
 	
 	public static void delete(String fileName){
@@ -32,7 +49,7 @@ public class PersistentArrayWithFreeSpace {
 	public static PersistentArrayWithFreeSpace open(String fileName) {
 		PersistentArrayWithFreeSpace tempPersistArray = null;
 		try{
-			tempPersistArray = new PersistentArrayWithFreeSpace(PersistentArray.open(fileName));
+			tempPersistArray = new PersistentArrayWithFreeSpace(fileName);
 		}
 		catch(Throwable e){
 			throw new RuntimeException("The persistent array, " + fileName + " could not be opened.", e);
@@ -40,22 +57,17 @@ public class PersistentArrayWithFreeSpace {
 		return tempPersistArray;
 	}
 	
-	private PersistentArrayWithFreeSpace(PersistentArray array){
-		persistentArray = array;
-		freeSpace = new PersistentFreeSpaceHeader(persistentArray.getHeader());
-	}
-	
 	public long allocate(){
 		long result = -1;
-		long nextFreeIndex = freeSpace.getPointer();
+		long nextFreeIndex = header.getPointer();
 		if(nextFreeIndex == END_OF_LIST){
 			result = putAllocatedSpace();
 		}
 		else{
-			result = freeSpace.getPointer();
+			result = nextFreeIndex;
 			long newPointer = ByteBuffer.wrap(persistentArray.get(result)).getLong();
-			freeSpace.setPointer(newPointer);
-			persistentArray.putHeader(freeSpace.getSerializedFreeSpaceHeader());
+			header.setPointer(newPointer);
+			putLocalHeader();
 		}
 		return result;
 	}
@@ -70,9 +82,10 @@ public class PersistentArrayWithFreeSpace {
 	public void deallocate(long position){
 		byte[] buffer = new byte[(int) persistentArray.getRecordSize()];
 		ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
-		byteBuffer.putLong(freeSpace.getPointer());
-		freeSpace.setPointer(position);
+		byteBuffer.putLong(header.getPointer());
+		header.setPointer(position);
 		persistentArray.put(position, byteBuffer.array());
+		putLocalHeader();
 	}
 
 	public void close() {
@@ -80,10 +93,13 @@ public class PersistentArrayWithFreeSpace {
 	}
 	
 	public byte[] getHeader(){
-		return freeSpace.getHeader();
+		return header.getUserHeader();
 	}
 	
 	public void put(long position, byte[] buffer){
+		long count = persistentArray.count();
+		if(position >= count)
+			throw new RuntimeException("Can't write past the end of the file, index was " + position + ", size is " + count);
 		persistentArray.put(position, buffer);
 	}
 	
@@ -92,10 +108,9 @@ public class PersistentArrayWithFreeSpace {
 	}
 	
 	public void putHeader(byte[] buffer){
-		freeSpace.setUserHeader(buffer);
-		persistentArray.putHeader(freeSpace.getSerializedFreeSpaceHeader());
+		header.setUserHeader(buffer);
+		persistentArray.putHeader(header.getSerializedFreeSpaceHeader());
 	}
-	
 	
 	public void printFile(){
 		persistentArray.printFile();

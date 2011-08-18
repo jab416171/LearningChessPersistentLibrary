@@ -1,6 +1,7 @@
 package edu.neumont.learningChess.engine;
 
-import edu.neumont.learningChess.engine.persistence.*;
+import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
+import edu.neumont.learningChess.engine.persistence.PersistentHashTable;
 
 public class GameStateCache {
 

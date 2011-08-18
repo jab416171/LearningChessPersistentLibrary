@@ -6,78 +6,75 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class PersistentArray {
-	private static final long LONG_SIZE = 8;
-	private static final long RECORD_SIZE_OFFSET = 0;
-	private static final long HEADER_SIZE_OFFSET = RECORD_SIZE_OFFSET + LONG_SIZE;
-	private static final long USER_HEADER_OFFSET = HEADER_SIZE_OFFSET + LONG_SIZE;
+	private static final long HEADER_OFFSET = 0;
 	private RandomAccessFile arrayStream;
-	private long recordSize;
-	private long headerSize;
-	
-	public long getRecordSize(){
-		return recordSize;
-	}
-	
-	private void readRecordSize()  {
-		try {
-			arrayStream.seek(RECORD_SIZE_OFFSET);
-			recordSize = arrayStream.readLong();
-		} catch (IOException e) {
-			recordSize = 0;
-		}
-	}
+	private PersistentArrayHeader header;
 
-	private void writeRecordSize() {
+	private PersistentArray(String fileName){
 		try {
-			arrayStream.seek(RECORD_SIZE_OFFSET);
-			arrayStream.writeLong(recordSize);
-		} catch (IOException e) {
-			throw new RuntimeException("Failure to write size.", e);
+			arrayStream = new RandomAccessFile(fileName, "rwd");
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("The file, " + fileName + ", does not exist", e);
 		}
 	}
 	
-	private void readHeaderSize()  {
+	private void readHeader() {
 		try {
-			arrayStream.seek(HEADER_SIZE_OFFSET);
-			headerSize = arrayStream.readLong();
+			arrayStream.seek(HEADER_OFFSET);
+			header = PersistentArrayHeader.read(arrayStream);
 		} catch (IOException e) {
-			headerSize = 0;
+			throw new RuntimeException("Failure to read header.", e);
 		}
 	}
-
-	private void writeHeaderSize() {
+	
+	private void writeHeader() {
 		try {
-			arrayStream.seek(HEADER_SIZE_OFFSET);
-			arrayStream.writeLong(headerSize);
+			arrayStream.seek(HEADER_OFFSET);
+			header.write(arrayStream);
 		} catch (IOException e) {
-			throw new RuntimeException("Failure to write size of header.", e);
+			throw new RuntimeException("Failure to write header.", e);
 		}
+		
 	}
+	
+//	private void readHeaderSize()  {
+//		try {
+//			arrayStream.seek(HEADER_SIZE_OFFSET);
+//			headerSize = arrayStream.readLong();
+//		} catch (IOException e) {
+//			headerSize = 0;
+//		}
+//	}
+//
+//	private void writeHeaderSize() {
+//		try {
+//			arrayStream.seek(HEADER_SIZE_OFFSET);
+//			arrayStream.writeLong(headerSize);
+//		} catch (IOException e) {
+//			throw new RuntimeException("Failure to write size of header.", e);
+//		}
+//	}
 
 	public static void create(String fileName, long recordSize, long headerSize){
 		if(fileName.isEmpty() || fileName == null){
 			throw new RuntimeException("Invalid file name: " + fileName + ".");
 		}
-		if(recordSize < 8 || recordSize > Long.MAX_VALUE){
-			throw new RuntimeException("Invlaid size of buffer: " + recordSize + ".(Must be greater than 8)");
+		if(recordSize < 0 || recordSize > Long.MAX_VALUE){
+			throw new RuntimeException("Invalid size of buffer: " + recordSize + ".(Must be greater than "+0+")");
 		}
 		File fileArray = new File(fileName);
 		if(fileArray.exists()){
 			throw new RuntimeException("Cannot create existing file - "  + fileName + ".");
 		}
-		else{
-			try {
-				fileArray.createNewFile();
-			} catch (IOException e) {
-				throw new RuntimeException("The file, " + fileName +", cannot be created", e);
-			}
-			PersistentArray persistantArray = new PersistentArray(fileName);
-			persistantArray.recordSize = recordSize;
-			persistantArray.headerSize = headerSize;
-			persistantArray.writeRecordSize();
-			persistantArray.writeHeaderSize();
-			persistantArray.close();
+		try {
+			fileArray.createNewFile();
+		} catch (IOException e) {
+			throw new RuntimeException("The file, " + fileName +", cannot be created", e);
 		}
+		PersistentArray persistentArray = new PersistentArray(fileName);
+		persistentArray.header = new PersistentArrayHeader(recordSize,headerSize);
+		persistentArray.writeHeader();
+		persistentArray.close();
 	}
 	
 	public static void delete(String fileName){
@@ -97,6 +94,7 @@ public class PersistentArray {
 		PersistentArray tempPersistArray = null;
 		if( fileArray.exists()){
 			tempPersistArray = new PersistentArray(fileName);
+			tempPersistArray.readHeader();
 		}
 		else{
 			throw new RuntimeException("The file, " + fileName + ", cannot be opened, or does not exist.");
@@ -112,49 +110,25 @@ public class PersistentArray {
 		}
 	}
 	
-	private PersistentArray(String fileName){
-		try {
-			arrayStream = new RandomAccessFile(fileName, "rwd");
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("The file, " + fileName + ", does not exist", e);
-		}
-		readRecordSize();
-		readHeaderSize();
-	}
 	
 	public void putHeader (byte[] buffer){
-		if(buffer.length != headerSize)
+		if(buffer.length != header.getClientHeaderSize())
 			throw new RuntimeException("Header file size mismatch");
-		try {
-			arrayStream.seek(USER_HEADER_OFFSET);
-			arrayStream.write(buffer, 0, (int)headerSize);
-		} catch (IOException e) {
-			throw new RuntimeException("IO error.", e);
-		}
+		header.setClientHeader(buffer);
+		writeHeader();
 	}
 	
 	public byte[] getHeader(){
-		byte[] buffer = null;
-		long temp = headerSize;
-		try {
-			if(temp == -1)
-				temp = arrayStream.length() - (2*LONG_SIZE);
-			buffer = new byte[(int)temp];
-			arrayStream.seek(USER_HEADER_OFFSET);
-			arrayStream.read(buffer);
-		} catch (IOException e) {
-			throw new RuntimeException("IO error.", e);
-		}
-		return buffer;
+		return header.getClientHeader();
 	}
 	
-	public void put (long n, byte[] buffer){
-		if(buffer.length > recordSize)
+	public void put (long index, byte[] buffer){
+		if(buffer.length > header.getClientRecordSize())
 			throw new RuntimeException("The buffer being put is larger than record size. Size mismatch error.");
-		if(n >= (Long.MAX_VALUE - 1) || n < 0)
-			throw new RuntimeException("Put location error.");
+		if(index >= (Long.MAX_VALUE - 1) || index < 0)
+			throw new RuntimeException("Put location error, index was " + index);
 		try {
-			long offset = getOffset(n);
+			long offset = getOffset(index);
 			arrayStream.seek(offset);
 			arrayStream.write(buffer, 0, buffer.length);
 		} catch (IOException e) {
@@ -162,20 +136,24 @@ public class PersistentArray {
 		}
 	}
 	
-	public byte[] get(long n){
+	private long getMaxIndex() {
+		return (Long.MAX_VALUE - header.getHeaderSize()) / header.getClientRecordSize();
+	}
+	
+	public byte[] get(long index){
+		if(index >= getMaxIndex() || index < 0)
+			throw new RuntimeException("Trying to get something from beyond file: " + index + ".");
 		int response = 0;
-		byte[] buffer = new byte[(int)recordSize];
-		if(n > (Long.MAX_VALUE - recordSize) || n < 0)
-			throw new RuntimeException("Trying to get something from beyond file: " + n + ".");
+		byte[] buffer = new byte[(int)header.getClientRecordSize()];
 		try {
-			long offset = getOffset(n);
+			long offset = getOffset(index);
 			arrayStream.seek(offset);
 			response = arrayStream.read(buffer);
 		} catch (IOException e) {
 			throw new RuntimeException("IO error.", e);
 		}
 		if(response == -1)// || Arrays.equals(buffer,new byte[buffer.length]))
-			buffer = null;
+			throw new RuntimeException("Reached end of file");
 		return buffer;
 	}
 	
@@ -187,7 +165,7 @@ public class PersistentArray {
 		} catch (IOException e) {
 			throw new RuntimeException("IO error.", e);
 		}
-		return ((length - USER_HEADER_OFFSET - headerSize)/recordSize);
+		return ((length - header.getHeaderSize()) / header.getClientRecordSize());
 	}
 	
 	
@@ -208,23 +186,17 @@ public class PersistentArray {
 	}
 	
 	
-	public long length(){
-		long length = 0;
-		try {
-			length = arrayStream.length();
-			
-		} catch (IOException e) {
-			throw new RuntimeException("IO error.", e);
-		}
-		return length;
-	}
-	
-	private long getOffset(long n){
-		return USER_HEADER_OFFSET + headerSize + (n * recordSize);
+	private long getOffset(long index){
+		return header.getHeaderSize() + (index * header.getClientRecordSize());
 	}
 
-	public void remove(long code) {
-		byte[] buffer = new byte[(int)recordSize];
-		this.put(code, buffer);
+	public void remove(long index) {
+		byte[] buffer = new byte[(int)header.getClientRecordSize()];
+		this.put(index, buffer);
 	}
+	
+	public long getRecordSize(){
+		return header.getClientRecordSize();
+	}
+	
 }

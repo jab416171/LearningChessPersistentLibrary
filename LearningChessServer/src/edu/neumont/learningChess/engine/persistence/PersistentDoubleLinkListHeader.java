@@ -5,11 +5,21 @@ import java.nio.ByteBuffer;
 public class PersistentDoubleLinkListHeader
 {
 	
-	private long index, listSize, maxListSize;
+	private long listHeadIndex, listSize, maxListSize;
 	public static final long SIZE = 24;
 	
+	public void incrementListSize() {
+		listSize++;
+	}
+	
+	public void decrementListSize() {
+		if(listSize<=1)
+			throw new RuntimeException("Can't decrement");
+		listSize--;
+	}
+	
 	public  PersistentDoubleLinkListHeader(long listIndex, long listSize, long maxListSize) {
-		this.index = listIndex;
+		this.listHeadIndex = listIndex;
 		this.listSize = listSize;
 		this.maxListSize = maxListSize;
 	}
@@ -18,12 +28,12 @@ public class PersistentDoubleLinkListHeader
 		deserialize(buffer);
 	}
 
-	public long getIndex() {
-		return index;
+	public long getListHeadIndex() {
+		return listHeadIndex;
 	}
 
-	public void setIndex(long index) {
-		this.index = index;
+	public void setListHeadIndex(long listHeadIndex) {
+		this.listHeadIndex = listHeadIndex;
 	}
 
 	public long getListSize() {
@@ -33,12 +43,16 @@ public class PersistentDoubleLinkListHeader
 	public void setListSize(long listSize) {
 		this.listSize = listSize;
 	}
+
+	public long getMaxListSize() {
+		return maxListSize;
+	}
 	
 	public byte[] serialize()
 	{
 		byte[] buffer = new byte[(int) SIZE];
 		ByteBuffer serializer = ByteBuffer.wrap(buffer);
-		serializer.putLong(index);
+		serializer.putLong(listHeadIndex);
 		serializer.putLong(listSize);
 		serializer.putLong(maxListSize);
 		return serializer.array();
@@ -47,13 +61,8 @@ public class PersistentDoubleLinkListHeader
 	public void deserialize(byte[] buffer)
 	{
 		ByteBuffer deserializer = ByteBuffer.wrap(buffer);
-		index = deserializer.getLong();
+		listHeadIndex = deserializer.getLong();
 		listSize = deserializer.getLong();
 		maxListSize = deserializer.getLong();
 	}
-
-	public long getMaxListSize() {
-		return maxListSize;
-	}
-	
 }

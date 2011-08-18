@@ -4,20 +4,31 @@ package edu.neumont.learningChess.engine.persistence;
 public class PersistentDoubleLinkList {
 
 	private PersistentArrayWithFreeSpace persistentArrayFS;
-	private long listSize;
-	private long headNodeIndex;
-	private long maxListSize;
+//	private long listSize;
+//	private long headNodeIndex;
+//	private long maxListSize;
 	private static final long LONG_SIZE = 8;
 	private static final long HEADER_SIZE = PersistentDoubleLinkListHeader.SIZE;
+	private PersistentDoubleLinkListHeader header;
 	
-	private PersistentDoubleLinkList(PersistentArrayWithFreeSpace persistentArray)
+	private PersistentDoubleLinkList(String linkListName)
 	{
-		this.persistentArrayFS = persistentArray;
-		PersistentDoubleLinkListHeader listHead = new PersistentDoubleLinkListHeader(persistentArrayFS.getHeader());
-		listSize = listHead.getListSize();
-		headNodeIndex = listHead.getIndex();
-		maxListSize = listHead.getMaxListSize();
-	}	
+		this.persistentArrayFS = PersistentArrayWithFreeSpace.open(linkListName);
+		header = new PersistentDoubleLinkListHeader(persistentArrayFS.getHeader());
+//		listSize = listHead.getListSize();
+//		headNodeIndex = listHead.getIndex();
+//		maxListSize = listHead.getMaxListSize();
+	}
+	
+	private void readHeader() {
+		byte[] buffer = persistentArrayFS.getHeader();
+		header.deserialize(buffer);
+	}
+	
+	private void writeHeader() {
+		byte[] buffer = header.serialize();
+		persistentArrayFS.putHeader(buffer);
+	}
 	
 	public static void create(String fileName, long recordSize, long maxListSize)
 	{
@@ -52,7 +63,7 @@ public class PersistentDoubleLinkList {
 	{
 		PersistentDoubleLinkList toOpen = null;
 		try{
-			toOpen = new PersistentDoubleLinkList(PersistentArrayWithFreeSpace.open(linkListName));
+			toOpen = new PersistentDoubleLinkList(linkListName);
 		}catch (Throwable e ){
 			throw new RuntimeException("The linked list, " + linkListName + ", could not be opened.",e);
 		}
@@ -72,7 +83,7 @@ public class PersistentDoubleLinkList {
 	 * @return the actual position of the buffer in the array.
 	 */
 	public long addNodeToFront(byte[] toAddBuffer, long position ){
-		long headNodePosition = headNodeIndex;
+		long headNodePosition = header.getListHeadIndex();
 		byte[] buffer = persistentArrayFS.get(headNodePosition);
 		PersistentDoubleLinkListNode headNode = new PersistentDoubleLinkListNode(buffer);
 		long oldFrontNodePosition = headNode.getFrontPointer();
@@ -82,7 +93,7 @@ public class PersistentDoubleLinkList {
 		boolean increment = false;
 		if(toAddNodePosition == -1){
 			toAddNodePosition  = persistentArrayFS.allocate();
-			increment = true;		
+			increment = true;
 		}
 		PersistentDoubleLinkListNode nodeToAdd 
 				= new PersistentDoubleLinkListNode(toAddBuffer, oldFrontNodePosition, headNodePosition);
@@ -108,25 +119,23 @@ public class PersistentDoubleLinkList {
 	
 	
 	private void incrementListSize(){
-		listSize += 1;
-		PersistentDoubleLinkListHeader newHeader = new PersistentDoubleLinkListHeader(headNodeIndex, listSize, maxListSize);
-		persistentArrayFS.putHeader(newHeader.serialize());
+		header.incrementListSize();
+		writeHeader();
 	}
 	
 	private void decrementListSize(){
-		listSize -= 1;
-		PersistentDoubleLinkListHeader newHeader = new PersistentDoubleLinkListHeader(headNodeIndex, listSize, maxListSize);
-		persistentArrayFS.putHeader(newHeader.serialize());
+		header.decrementListSize();
+		writeHeader();
 	}
 	
 	public long getListLength()
 	{
-		return listSize;
+		return header.getListSize();
 	}
 	
 	public long getMaxListSize()
 	{
-		return maxListSize;
+		return header.getMaxListSize();
 	}
 	
 	public byte[] removeNode(long position)
@@ -144,15 +153,15 @@ public class PersistentDoubleLinkList {
 		decrementListSize();
 		persistentArrayFS.put(oldFrontNodePosition, backNode.getSerializedNode());
 		persistentArrayFS.put(backPosition, backNode.getSerializedNode());
-		return currentNode.getBuffer();
+		return currentNode.getData();
 	}
 	
 	public byte[] getFrontNodeBuffer(){
-		byte[] buffer = persistentArrayFS.get(headNodeIndex);
+		byte[] buffer = persistentArrayFS.get(header.getListHeadIndex());
 		PersistentDoubleLinkListNode headNode = new PersistentDoubleLinkListNode(buffer);
 		long frontNodePosition = headNode.getFrontPointer();
 		PersistentDoubleLinkListNode frontNode = new PersistentDoubleLinkListNode(persistentArrayFS.get(frontNodePosition));
-		 return frontNode.getBuffer();
+		 return frontNode.getData();
 	}
 	
 	private byte[] getNode(long position)
@@ -162,19 +171,19 @@ public class PersistentDoubleLinkList {
 	
 	public byte[] get(long position){
 		PersistentDoubleLinkListNode node = new PersistentDoubleLinkListNode(getNode(position));
-		return node.getBuffer();
+		return node.getData();
 	}
 	
 	public byte[] removeLastNode(){
 		PersistentDoubleLinkListHeader listHead = new PersistentDoubleLinkListHeader(persistentArrayFS.getHeader());
-		PersistentDoubleLinkListNode header = new PersistentDoubleLinkListNode(persistentArrayFS.get(listHead.getIndex()));
+		PersistentDoubleLinkListNode header = new PersistentDoubleLinkListNode(persistentArrayFS.get(listHead.getListHeadIndex()));
 		return removeNode(header.getBackPointer());
 	}
 
 	public byte[] getLastNodeBuffer() {
 		PersistentDoubleLinkListHeader listHead = new PersistentDoubleLinkListHeader(persistentArrayFS.getHeader());
-		PersistentDoubleLinkListNode header = new PersistentDoubleLinkListNode(persistentArrayFS.get(listHead.getIndex()));
-		return new PersistentDoubleLinkListNode(persistentArrayFS.get(header.getBackPointer())).getBuffer();
+		PersistentDoubleLinkListNode header = new PersistentDoubleLinkListNode(persistentArrayFS.get(listHead.getListHeadIndex()));
+		return new PersistentDoubleLinkListNode(persistentArrayFS.get(header.getBackPointer())).getData();
 	}
 	
 	

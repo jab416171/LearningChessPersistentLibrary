@@ -6,59 +6,42 @@ public class PersistentDoubleLinkListNode {
 
 	static final long LONG_SIZE = 8;
 	private long frontPointer, backPointer;
-	private byte[] buffer;
-	private byte[] serializedNode;
+	private byte[] data;
 	
 	public PersistentDoubleLinkListNode(byte[] serializedNode) {
-		this.serializedNode = serializedNode;
-		deserialize();
+		deserialize(serializedNode);
 	}
 	
-	public PersistentDoubleLinkListNode(byte[] buffer, long frontPointer, long backPointer) {
-		this.buffer = buffer;
+	public PersistentDoubleLinkListNode(byte[] data, long frontPointer, long backPointer) {
+		this.data = data;
 		this.frontPointer = frontPointer;
 		this.backPointer = backPointer;
-		serialize();
 	}
 	
-	private void serialize(){
-		byte[] serializedBuffer = new byte[(int) (LONG_SIZE + LONG_SIZE + buffer.length)];
+	private byte[] serialize(){
+		byte[] serializedBuffer = new byte[(int) (LONG_SIZE + LONG_SIZE + data.length)];
 		ByteBuffer byteBuffer = ByteBuffer.wrap(serializedBuffer);
 		byteBuffer.putLong(frontPointer);
 		byteBuffer.putLong(backPointer);
-		byteBuffer.put(buffer);
-		serializedNode = serializedBuffer;
+		byteBuffer.put(data);
+		return byteBuffer.array();
 	}
 	
 
-	private void deserialize(){
+	private void deserialize(byte[] serializedNode){
 		ByteBuffer byteBuffer = ByteBuffer.wrap(serializedNode);
 		frontPointer = byteBuffer.getLong();
 		backPointer = byteBuffer.getLong();
-		buffer = new byte[byteBuffer.remaining()];
-		byteBuffer.get(buffer, 0, byteBuffer.remaining());
+		data = new byte[byteBuffer.remaining()];
+		byteBuffer.get(data, 0, byteBuffer.remaining());
 	}
 	
-	/**
-	 * Method to get the size of the serialized buffer.
-	 * Serialized buffer is buffer plus frontPointer and backPointer.
-	 * @return
-	 */
-	public long getSerializedSize()	{
-		return serializedNode.length;
-	}
-	
-	public byte[] getSerializedNode(){
-		return serializedNode;
-	}
-
 	public long getFrontPointer() {
 		return frontPointer;
 	}
 
 	public void setFrontPointer(long frontPointer) {
 		this.frontPointer = frontPointer;
-		serialize();
 	}
 
 	public long getBackPointer() {
@@ -67,15 +50,22 @@ public class PersistentDoubleLinkListNode {
 
 	public void setBackPointer(long backPointer) {
 		this.backPointer = backPointer;
-		serialize();
 	}
 
-	public byte[] getBuffer() {
-		return buffer;
+	public byte[] getData() {
+		return data;
 	}
 
-	public void setBuffer(byte[] buffer) {
-		this.buffer = buffer;
-		serialize();
+	public void setData(byte[] data) {
+		this.data = data;
 	}	
+	
+	public long getSerializedSize()	{
+		return LONG_SIZE + LONG_SIZE + data.length;
+	}
+	
+	public byte[] getSerializedNode(){
+		return serialize();
+	}
+
 }

@@ -1,4 +1,4 @@
-package edu.neumont.persistence;
+package edu.neumont.learningChess.engine.persistence;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -16,16 +16,19 @@ public class PersistentArrayHeader {
 		setClientHeader(new byte[(int) clientHeaderSize]);
 	}
 	
-	public void read(RandomAccessFile file)
+	public static PersistentArrayHeader read(RandomAccessFile file)
 	{
+		PersistentArrayHeader header = null;
 		try {
-			clientRecordSize = file.readLong();
-			clientHeaderSize = file.readLong();
-			file.read(getClientHeader());
+			long clientRecordSize = file.readLong();
+			long clientHeaderSize = file.readLong();
+			header = new PersistentArrayHeader(clientRecordSize, clientHeaderSize);
+			file.read(header.clientHeader);
 			
 		} catch (IOException e) {
 			throw new RuntimeException("Failure to read PersistentArrayHeader.", e);
 		}
+		return header;
 	}
 	
 	public void write(RandomAccessFile file)
@@ -40,6 +43,9 @@ public class PersistentArrayHeader {
 		}
 	}
 	
+	public long getHeaderSize() {
+		return clientHeader.length + clientHeaderSize;
+	}
 	
 	public long getClientRecordSize() {
 		return clientRecordSize;
@@ -49,11 +55,11 @@ public class PersistentArrayHeader {
 		return clientHeaderSize;
 	}
 
-	private byte[] getClientHeader() {
+	public byte[] getClientHeader() {
 		return clientHeader;
 	}
 
-	private void setClientHeader(byte[] clientHeader) {
+	public void setClientHeader(byte[] clientHeader) {
 		
 		this.clientHeader = clientHeader.clone();
 	}

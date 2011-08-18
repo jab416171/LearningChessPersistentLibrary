@@ -2,17 +2,17 @@ package edu.neumont.learningChess.engine.persistence;
 
 import java.nio.ByteBuffer;
 
-public class PersistentFreeSpaceHeader{
+public class PersistentArrayWithFreeSpaceHeader{
 	private static final long LONG_SIZE = 8;
 	private long listPointer;
 	private byte[] userHeader;
 	
-	public PersistentFreeSpaceHeader(long pointer, byte[] userHeader){
+	public PersistentArrayWithFreeSpaceHeader(long pointer, byte[] userHeader){
 		this.listPointer = pointer;
 		this.userHeader = userHeader;
 	}
 	
-	public PersistentFreeSpaceHeader(byte[] buffer){
+	public PersistentArrayWithFreeSpaceHeader(byte[] buffer){
 		deserialize(buffer);
 	}
 	
@@ -31,12 +31,12 @@ public class PersistentFreeSpaceHeader{
 		byteBuffer.get(userHeader, 0, byteBuffer.remaining());
 	}
 	
-	public byte[] getSerializedFreeSpaceHeader(){
-		return serialize();
+	public long getSize() {
+		return userHeader.length + LONG_SIZE;
 	}
 	
-	public byte[] getHeader(){
-		return userHeader;
+	public byte[] getSerializedFreeSpaceHeader(){
+		return serialize();
 	}
 	
 	public long getPointer(){
@@ -45,6 +45,10 @@ public class PersistentFreeSpaceHeader{
 	
 	public void setPointer(long pointer){
 		this.listPointer = pointer;
+	}
+	
+	public byte[] getUserHeader(){
+		return userHeader;
 	}
 	
 	public void setUserHeader(byte[] buffer){
