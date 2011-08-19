@@ -5,7 +5,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
 
-public class PersistentDoubleLinkListTest extends TestCase {
+public class oldPersistentDoubleLinkListTest extends TestCase {
 	private static final String FILENAME = "PDLLxxxxx";
 	public void testCreate() {
 		boolean exceptionOccured = false;

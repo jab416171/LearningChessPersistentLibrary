@@ -113,7 +113,7 @@ public class PersistentArray {
 	
 	public void putHeader (byte[] buffer){
 		if(buffer.length != header.getClientHeaderSize())
-			throw new RuntimeException("Header file size mismatch");
+			throw new RuntimeException("Header file size mismatch, buffer length is " + buffer.length + ", clientHeaderSize is " + header.getClientHeaderSize());
 		header.setClientHeader(buffer);
 		writeHeader();
 	}

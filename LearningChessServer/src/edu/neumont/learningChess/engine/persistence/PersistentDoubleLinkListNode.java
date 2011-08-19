@@ -1,6 +1,7 @@
 package edu.neumont.learningChess.engine.persistence;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class PersistentDoubleLinkListNode {
 
@@ -66,6 +67,16 @@ public class PersistentDoubleLinkListNode {
 	
 	public byte[] getSerializedNode(){
 		return serialize();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "PersistentDoubleLinkListNode [frontPointer=" + frontPointer
+				+ ", backPointer=" + backPointer + ", data="
+				+ Arrays.toString(data) + "]";
 	}
 
 }

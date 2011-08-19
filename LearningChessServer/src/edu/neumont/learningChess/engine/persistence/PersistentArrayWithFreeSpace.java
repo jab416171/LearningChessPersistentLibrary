@@ -35,25 +35,17 @@ public class PersistentArrayWithFreeSpace {
 	
 	private void putLocalHeader() {
 		byte[] buffer = header.getSerializedFreeSpaceHeader();
+		if(buffer.length != header.getSize())
+			throw new RuntimeException("Header file size mismatch, buffer length is " + buffer.length + ", header size is " + header.getSize());
 		this.persistentArray.putHeader(buffer);
 	}
 	
 	public static void delete(String fileName){
-		try {
-			PersistentArray.delete(fileName);
-		} catch (Throwable e) {
-			throw new RuntimeException("The persistent array, " + fileName +", could not be deleted", e);
-		}
+		PersistentArray.delete(fileName);
 	}
 	
 	public static PersistentArrayWithFreeSpace open(String fileName) {
-		PersistentArrayWithFreeSpace tempPersistArray = null;
-		try{
-			tempPersistArray = new PersistentArrayWithFreeSpace(fileName);
-		}
-		catch(Throwable e){
-			throw new RuntimeException("The persistent array, " + fileName + " could not be opened.", e);
-		}
+		PersistentArrayWithFreeSpace tempPersistArray = new PersistentArrayWithFreeSpace(fileName);
 		return tempPersistArray;
 	}
 	
@@ -109,11 +101,12 @@ public class PersistentArrayWithFreeSpace {
 	
 	public void putHeader(byte[] buffer){
 		header.setUserHeader(buffer);
-		persistentArray.putHeader(header.getSerializedFreeSpaceHeader());
+		putLocalHeader();
 	}
 	
 	public void printFile(){
 		persistentArray.printFile();
 	}
+
 	
 }	

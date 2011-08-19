@@ -7,6 +7,7 @@ public class PersistentArrayHeader {
 	
 	private long clientHeaderSize;
 	private long clientRecordSize;
+	private static final int LONG_SIZE = 8;
 	private byte[] clientHeader;
 	
 	
@@ -44,7 +45,7 @@ public class PersistentArrayHeader {
 	}
 	
 	public long getHeaderSize() {
-		return clientHeader.length + clientHeaderSize;
+		return (LONG_SIZE * 2) + getClientHeaderSize();
 	}
 	
 	public long getClientRecordSize() {
