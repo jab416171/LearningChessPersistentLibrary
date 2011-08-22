@@ -143,17 +143,16 @@ public class PersistentArray {
 	public byte[] get(long index){
 		if(index >= getMaxIndex() || index < 0)
 			throw new RuntimeException("Trying to get something from beyond file: " + index + ".");
-		int response = 0;
+		
 		byte[] buffer = new byte[(int)header.getClientRecordSize()];
 		try {
 			long offset = getOffset(index);
 			arrayStream.seek(offset);
-			response = arrayStream.read(buffer);
+			// end of file will keep the buffer empty
+			arrayStream.read(buffer);
 		} catch (IOException e) {
 			throw new RuntimeException("IO error.", e);
 		}
-		if(response == -1)// || Arrays.equals(buffer,new byte[buffer.length]))
-			throw new RuntimeException("Reached end of file");
 		return buffer;
 	}
 	

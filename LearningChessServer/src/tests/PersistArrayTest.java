@@ -282,7 +282,7 @@ public class PersistArrayTest extends TestCase {
 		catch (Throwable e) {
 			exceptionOccured = true;
 		}
-		assertTrue(exceptionOccured);
+		assertFalse(exceptionOccured);
 		exceptionOccured = false;
 		try {
 			assertTrue(Arrays.equals(array.get(2), new byte[]{103,01,1,1,1,101,01,1,1,1}));

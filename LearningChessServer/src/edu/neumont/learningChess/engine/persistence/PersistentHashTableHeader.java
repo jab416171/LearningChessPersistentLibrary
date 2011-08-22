@@ -4,25 +4,27 @@ import java.nio.ByteBuffer;
 
 public class PersistentHashTableHeader {
 	private static final int BYTES_IN_A_LONG = 8;
-	private long sizeOfHash;
-	private byte[] buffer;
+	private long tableLength;
 	
 	PersistentHashTableHeader(long size){
-		buffer = new byte[BYTES_IN_A_LONG];
-		sizeOfHash = size;
-		ByteBuffer.wrap(buffer).putLong(size);
+		tableLength = size;
 	}
 	
 	PersistentHashTableHeader(byte[] buffer){
-		this.buffer = buffer;
-		sizeOfHash = ByteBuffer.wrap(buffer).getLong();
+		deserialize(buffer);
+	}
+
+	private void deserialize(byte[] buffer) {
+		tableLength = ByteBuffer.wrap(buffer).getLong();
 	}
 	
-	public long getSizeOfHash(){
-		return sizeOfHash;
-	}
-	
-	public byte[] getHashTableHeaderBuffer(){
+	public byte[] serialize(){
+		byte[] buffer = new byte[BYTES_IN_A_LONG];
+		ByteBuffer.wrap(buffer).putLong(tableLength);
 		return buffer;
+	}
+	
+	public long getTableLength(){
+		return tableLength;
 	}
 }

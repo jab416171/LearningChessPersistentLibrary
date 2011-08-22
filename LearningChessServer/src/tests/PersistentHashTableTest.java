@@ -1,8 +1,7 @@
 package tests;
 
-import persistence.PersistentHashTable;
-
 import junit.framework.TestCase;
+import edu.neumont.learningChess.engine.persistence.PersistentHashTable;
 
 public class PersistentHashTableTest extends TestCase {
 
@@ -99,10 +98,13 @@ public class PersistentHashTableTest extends TestCase {
 	}
 
 	public void testDelete() {
-		
+		try{ 
+			PersistentHashTable.delete(FILENAME);
+		}catch(Throwable e){
+		}
 		boolean exceptionOccured = false;
 		try{
-			PersistentHashTable.create(FILENAME, 0, 0);
+			PersistentHashTable.create(FILENAME, 10, 10);
 		}
 		catch(Throwable e){
 			e.printStackTrace();
@@ -146,6 +148,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertTrue(exceptionOccured);
+		toDelete.close();
 	}
 
 	public void testOpen() {
@@ -194,6 +197,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertTrue(exceptionOccured);
+		toCloseLinkList.close();
 	}
 
 	public void testGet() {
@@ -207,7 +211,6 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		
 		exceptionOccured = false;
 		try{
 			toTest.put(new byte[]{0,1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32}, 11);
@@ -306,6 +309,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		toTest.close();
 	}
 
 	public void testPut() {
@@ -395,6 +399,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		toTest.close();
 	}
 
 	public void testRemove() {
@@ -488,6 +493,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		toTest.close();
 	}
 
 	
@@ -546,6 +552,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		toTest.close();
 	}
 
 

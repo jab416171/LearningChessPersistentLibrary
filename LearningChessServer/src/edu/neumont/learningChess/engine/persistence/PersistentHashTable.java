@@ -9,8 +9,7 @@ public class PersistentHashTable {
 	 * 
 	 *  16 bytes -> 4 bytes using XOR ^
 	 *  use the 4 bytes as the hash code
-	 *  k % 1 billion
-	 *  compare full gamestates, get index for lookup in linkedList
+	 *  k % table size
 	 * 
 	 */
 	private PersistentArray persistentArray;
@@ -18,15 +17,26 @@ public class PersistentHashTable {
 	private static final int BYTES_IN_A_LONG = 8;
 	private static final int BITS_IN_A_BYTE = 8;
 	
-	private long hashSize;
+	private long hashSize; 
 	private long recordSize;
 	private byte[] EMPTY_KEY = null;
-		
-	public static void create(String fileName, long recordSize, long hashSize){
+	private static final long LOW_ORDER_MASK = 0x7FFFFFFFFFFFFFFFL;
+		 
+	private PersistentHashTable(String fileName){
+		persistentArray = PersistentArray.open(fileName);
+		recordSize = persistentArray.getRecordSize();
+		hashSize = new PersistentHashTableHeader(persistentArray.getHeader()).getTableLength();
+		EMPTY_KEY = new byte[(int)(recordSize-INFO_SIZE)];
+	}
+	
+	public static void create(String fileName, long keyLength, long tableLength){
+		if(keyLength <= 0)
+			throw new RuntimeException("Record size must be positive");
+			
 		try {
-			PersistentArray.create(fileName, recordSize+INFO_SIZE, BYTES_IN_A_LONG);
+			PersistentArray.create(fileName, keyLength+INFO_SIZE, BYTES_IN_A_LONG);
 			PersistentArray array = PersistentArray.open(fileName);
-			array.putHeader(new PersistentHashTableHeader(hashSize).getHashTableHeaderBuffer());
+			array.putHeader(new PersistentHashTableHeader(tableLength).serialize());
 			array.close();
 		} catch (Throwable e) {
 			throw new RuntimeException("The hash table, " + fileName +", could not be created", e);
@@ -34,23 +44,12 @@ public class PersistentHashTable {
 	}
 
 	public static void delete(String fileName){
-		try {
-			PersistentArray.delete(fileName);
-		} catch (Throwable e) {
-			throw new RuntimeException("The hash table, " + fileName +", could not be deleted", e);
-		}		
+		PersistentArray.delete(fileName);
 	}
 	
 	public static PersistentHashTable open(String fileName)
 	{
-		PersistentHashTable tempHashTable = null;
-		try{
-			tempHashTable = new PersistentHashTable(PersistentArray.open(fileName));
-		}
-		catch(Throwable e){
-			throw new RuntimeException("The hash table, " + fileName + " could not be opened.", e);
-		}
-		return tempHashTable;
+		return new PersistentHashTable(fileName);
 	}
 	
 	public void close(){
@@ -58,63 +57,53 @@ public class PersistentHashTable {
 	}
 
 	
-	private PersistentHashTable(PersistentArray array){
-		persistentArray = array;
-		recordSize = array.getRecordSize();
-		hashSize = new PersistentHashTableHeader(array.getHeader()).getSizeOfHash();
-		EMPTY_KEY = new byte[(int)(recordSize-INFO_SIZE)];
-	}
 	
-	public long get(byte[] buffer){
+	public long get(byte[] key){
 		long index = -1;
-		HashedLocation location = findIndexLinearProbe(buffer);
-		if(location.isFound){
-			HashEntry entry = new HashEntry(persistentArray.get(location.index));
-			index = entry.value;
-		}
+		Long location = findIndexLinearProbe(key);
+		HashEntry entry = getEntry(location);
+		index = isEmpty(entry.key) ? -1 : entry.value;
 		return index;			
+	}
+
+	private HashEntry getEntry(Long location) {
+		return new HashEntry(persistentArray.get(location));
 	}
 	
 	public void put(byte[] key, long value){
 		HashEntry toPut = new HashEntry(key, value);
-		long index = findIndexLinearProbe(key).index;
-		persistentArray.put(index, toPut.serializedEntry);
+		long index = findIndexLinearProbe(key);
+		persistentArray.put(index, toPut.serialize());
 
+	}
+	
+	private boolean isEmpty(byte[] key) {
+		return Arrays.equals(key, new byte[key.length]);
 	}
 	
 	
 	public long remove(byte[] buffer){
-		long n = -1;
-		HashedLocation location = findIndexLinearProbe(buffer);
 		HashEntry toRemove = null;
-		if(location.isFound) {
-			n = location.index;
-			toRemove = new HashEntry(persistentArray.get(n));
-			persistentArray.remove(n);
-			 n++;
-			 byte[] current = persistentArray.get(n);
-			 while(current != null && !Arrays.equals(current, new byte[current.length])){
-				 current = persistentArray.get(n);
-				 persistentArray.remove(n);
-				 n++;
-				 if(current != null){
-					 HashEntry currentEntry = new HashEntry(current);
-				 	put(currentEntry.key, currentEntry.value);
-				 }
-			 }
+		long index = findIndexLinearProbe(buffer);
+		toRemove = getEntry(index);
+		persistentArray.remove(index);
+		
+		for(;;) {
+			index++;
+			byte[] current = persistentArray.get(index);
+			if(isEmpty(current))
+				break;
+			persistentArray.remove(index);
+			HashEntry currentEntry = new HashEntry(current);
+			put(currentEntry.key, currentEntry.value);
 		}
-		long pointer = -1;
-		if(toRemove != null)
-			pointer = toRemove.value;
-		return pointer;
+		return toRemove.value;
 	}
 	
-	
-	public void printss()
+	public void printFile()
 	{
 		persistentArray.printFile();
 	}
-
 	
 	public long getHash(byte[] toHash){
 		long l = 0;
@@ -122,8 +111,8 @@ public class PersistentHashTable {
 			l ^= getLongFromBytes(toHash, i);
 			i+=BYTES_IN_A_LONG;
 		}
-		long mask = Long.parseLong("7FFFFFFFFFFFFFFF", 16);
-		l = l & mask;
+		
+		l &= LOW_ORDER_MASK;
 		return l;
 	}
 	
@@ -138,24 +127,19 @@ public class PersistentHashTable {
 	/**
 	 * Method for finding the index of the byte[] in the hash table using Linear probing hash.
 	 * If the specified byte[] is not in the table, return the next free space where the hash could go.
-	 * @param byte[] toFind
+	 * @param byte[] key
 	 * @return index of the array or the next free space in the probe
 	 */
-	private HashedLocation findIndexLinearProbe(byte[] toFind){
-		HashedLocation location = null;
-		long index = getHash(toFind);
+	private Long findIndexLinearProbe(byte[] key){
+		Long location = null;
+		long index = getHash(key);
 		index = index % hashSize;
 		long startingLocation = index;
 		
 		for (;;) {
 			byte[] hashEntryBuffer = persistentArray.get(index);
-			if(hashEntryBuffer == null){
-				location = new HashedLocation(false, index);
-			}
-			else{
-				HashEntry entry = new HashEntry(hashEntryBuffer);
-				location = getEmptyOrFOundLocation(entry.key, toFind, index);
-			}
+			HashEntry entry = new HashEntry(hashEntryBuffer);
+			location = getEmptyOrFoundLocation(entry.key, key, index);
 			if (location != null) break;
 
 			index++;
@@ -168,13 +152,11 @@ public class PersistentHashTable {
 	}
 	
 	
-	private HashedLocation getEmptyOrFOundLocation(byte[] key, byte[] toFind, long index) {
-		HashedLocation location = null;
+	private Long getEmptyOrFoundLocation(byte[] key, byte[] toFind, long index) {
+		Long location = null;
 		
-		if (Arrays.equals(key, EMPTY_KEY)) {
-			location = new HashedLocation(false, index);
-		} else if (Arrays.equals(key, toFind)) {
-			location = new HashedLocation(true, index);
+		if (isEmpty(key) || Arrays.equals(key, toFind)) {
+			location = index;
 		}
 		return location;
 	}
@@ -182,29 +164,29 @@ public class PersistentHashTable {
 	private class HashEntry{
 		byte[] key;
 		long value;
-		byte[] serializedEntry;
-		public HashEntry(byte[] buffer){
-			serializedEntry = buffer;
+		public HashEntry(byte[] serializedEntry){
+			deserialize(serializedEntry);
+		}
+		
+		public HashEntry(byte[] key, long value){
+			this.key = key;
+			this.value = value;
+		}
+		
+		public byte[] serialize() {
+			byte[] buffer = new byte[(int) recordSize];
+			ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+			byteBuffer.putLong(value);
+			byteBuffer.put(key);
+			return byteBuffer.array();
+		}
+		
+		public void deserialize(byte[] buffer) {
 			ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 			value = byteBuffer.getLong();
 			key = new byte[(int) (recordSize-INFO_SIZE)];
 			byteBuffer.get(key, 0, byteBuffer.remaining());
 		}
-		
-		public HashEntry(byte[] key, long value){
-			serializedEntry = new byte[(int) recordSize];
-			ByteBuffer byteBuffer = ByteBuffer.wrap(serializedEntry);
-			byteBuffer.putLong(value);
-			byteBuffer.put(key);
-		}
 	}
 	
-	private class HashedLocation{
-		private boolean isFound;
-		private long index;
-		public HashedLocation(boolean isFound, long index){
-			this.isFound = isFound;
-			this.index = index;
-		}
-	}
 }

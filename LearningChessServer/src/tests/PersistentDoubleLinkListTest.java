@@ -2,6 +2,8 @@ package tests;
 
 import java.util.Arrays;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
 
 import junit.framework.TestCase;
@@ -98,6 +100,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			PersistentDoubleLinkList.delete(FILENAME);
 		} catch (Throwable e) {
 		}
+		
 	}
 
 	public void testDelete() {
@@ -146,6 +149,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertTrue(exceptionOccured);
+		toDelete.close();
 	}
 
 	public void testOpen() {
@@ -192,23 +196,52 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	}
 
 	public void testClose() {
-//		fail("Not yet implemented");
+		PersistentDoubleLinkList toTest = null;
+		boolean exceptionOccured = false;
+		try {
+			PersistentDoubleLinkList.create(FILENAME, HEADER_SIZE, HEADER_SIZE);
+			toTest = PersistentDoubleLinkList.open(FILENAME);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		try {
+			toTest.close();
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		try {
+			toTest = PersistentDoubleLinkList.open(FILENAME);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		toTest.close();
+		
 	}
 
-	public void testGetLength() {
-//		fail("Not yet implemented");
-	}
+	public void testPutGetHeader() {
+		try {
+			PersistentDoubleLinkList.delete(FILENAME);
+		} catch (Throwable e) {
+		}
 
-	public void testGet() {
-//		fail("Not yet implemented");
-	}
-
-	public void testPutHeader() {
-//		fail("Not yet implemented");
-	}
-
-	public void testGetHeader() {
-//		fail("Not yet implemented");
+		PersistentDoubleLinkList toTest = null;
+		boolean exceptionOccured = false;
+		try {
+			PersistentDoubleLinkList.create(FILENAME, HEADER_SIZE, HEADER_SIZE);
+			toTest = PersistentDoubleLinkList.open(FILENAME);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		byte[] header = new byte[]{1,2,3,4,5,6,7,8,9,0};
+		toTest.putHeader(header);
+		assertEquals(header, toTest.getHeader());
+		toTest.close();
 	}
 
 	public void testRemoveFromBack() {
@@ -288,6 +321,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertEquals(toTest.getLength(),0);
+		toTest.close();
 		
 	}
 
@@ -295,6 +329,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME);
 		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 
 		PersistentDoubleLinkList toTest = null;
@@ -415,10 +450,165 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		toTest.close();
 	}
 
 	public void testMoveToFront() {
-//		fail("Not yet implemented");
+		try {
+			PersistentDoubleLinkList.delete(FILENAME);
+		} catch (Throwable e) {
+		}
+
+		PersistentDoubleLinkList toTest = null;
+		boolean exceptionOccured = false;
+		try {
+			PersistentDoubleLinkList.create(FILENAME, HEADER_SIZE, HEADER_SIZE);
+			toTest = PersistentDoubleLinkList.open(FILENAME);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		exceptionOccured = false;
+		try {
+			toTest.moveToFront(1);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertTrue(exceptionOccured);
+		assertEquals(0,toTest.getLength());
+		long indexOne = 0, indexTwo = 0, indexThree = 0;
+		exceptionOccured = false;
+		try {
+			indexOne = toTest.addToFront(new byte[]{1,2,3,4,5,6,7,8,9,0});
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		
+		exceptionOccured = false;
+		try {
+			toTest.moveToFront(indexOne);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		
+		exceptionOccured = false;
+		try {
+			indexTwo = toTest.addToFront(new byte[]{6,7,8,9,0,1,2,3,4,5});
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		
+		exceptionOccured = false;
+		try {
+			toTest.moveToFront(indexOne);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		
+		exceptionOccured = false;
+		try {
+			toTest.removeFromBack();
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertEquals(1,toTest.getLength());
+		assertTrue(Arrays.equals(toTest.get(indexOne),new byte[]{1,2,3,4,5,6,7,8,9,0}));
+		
+		exceptionOccured = false;
+		try {
+			indexTwo = toTest.addToFront(new byte[]{6,7,8,9,0,1,2,3,4,5});
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		exceptionOccured = false;
+		try {
+			indexThree = toTest.addToFront(new byte[]{2,4,6,8,0,1,3,5,7,9});
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(new byte[]{2,4,6,8,0,1,3,5,7,9},toTest.get(indexThree)));
+		
+		exceptionOccured = false;
+		try {
+			toTest.moveToFront(indexOne);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(new byte[]{2,4,6,8,0,1,3,5,7,9},toTest.get(indexThree)));
+		
+		exceptionOccured = false;
+		try {
+			toTest.moveToFront(indexTwo);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(new byte[]{2,4,6,8,0,1,3,5,7,9},toTest.get(indexThree)));
+		
+		exceptionOccured = false;
+		try {
+			toTest.removeFromBack();
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		
+
+		assertEquals(2,toTest.getLength());
+		
+		exceptionOccured = false;
+		try {
+			toTest.removeFromBack();
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertEquals(1,toTest.getLength());
+		
+		exceptionOccured = false;
+		try {
+			toTest.removeFromBack();
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertEquals(0,toTest.getLength());
+
+
+		
+		
+		toTest.close();
+		
 	}
 
 }

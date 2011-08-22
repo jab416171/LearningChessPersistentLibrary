@@ -119,7 +119,7 @@ public class GameStateCache {
 	}
 	
 	public void printHash(){
-		hashTable.printss();
+		hashTable.printFile();
 	}
 	
 	public long linkedListLength()
