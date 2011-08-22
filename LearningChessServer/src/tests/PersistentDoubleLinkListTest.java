@@ -1,6 +1,8 @@
-package edu.neumont.learningChess.engine.persistence;
+package tests;
 
 import java.util.Arrays;
+
+import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
 
 import junit.framework.TestCase;
 
