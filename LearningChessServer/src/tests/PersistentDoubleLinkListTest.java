@@ -9,8 +9,9 @@ import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
 import junit.framework.TestCase;
 
 public class PersistentDoubleLinkListTest extends TestCase {
-	private static final int HEADER_SIZE = 10;
+	private static final int HEADER_SIZE = 8;
 	private static final String FILENAME = "PDLLxxxxx";
+	private static int FILE_NUMBER = 0;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -23,7 +24,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	public void testCreate() {
 		boolean exceptionOccured = false;
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 28" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 
@@ -39,7 +41,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			PersistentDoubleLinkList.open(FILENAME).close();
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 44" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -65,7 +68,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			PersistentDoubleLinkList.open(FILENAME).close();
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 70" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -97,7 +101,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		assertTrue(exceptionOccured);
 
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 102" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 		
@@ -105,7 +110,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 	public void testDelete() {
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 110" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 		boolean exceptionOccured = false;
@@ -127,7 +133,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 132" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -136,7 +143,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			toDelete.close();
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 141" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -144,7 +152,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 149" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -180,7 +189,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			toCloseLinkList.close();
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 185" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -224,7 +234,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 	public void testPutGetHeader() {
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 229" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 
@@ -238,7 +249,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		byte[] header = new byte[]{1,2,3,4,5,6,7,8,9,0};
+		byte[] header = new byte[]{1,2,3,4,5,6,7,8};
 		toTest.putHeader(header);
 		assertEquals(header, toTest.getHeader());
 		toTest.close();
@@ -246,7 +257,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 	public void testRemoveFromBack() {
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 261" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 
@@ -264,7 +276,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		long one = 0, two = 0, three = 0, four = 0;
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 };
+			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5};
 			one = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -284,7 +296,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+			buffer = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7};
 			two = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -296,7 +308,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			buffer = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2};
 			three = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -327,7 +339,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 	public void testAddToFront() {
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 343" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -342,11 +355,12 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		
 		byte[] buffer = null;
 		long one = 0, two = 0, three = 0, four = 0;
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 };
+			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5};
 			one = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -358,7 +372,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+			buffer = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7};
 			two = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -370,19 +384,20 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			buffer = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2 };
 			three = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		System.out.println(toTest.getLength());
 		assertEquals(toTest.getLength(),3);
 		assertTrue(Arrays.equals(toTest.get(three), buffer));
 
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 };
+			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5};
 			four = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -392,14 +407,14 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		assertEquals(toTest.getLength(),4);
 		assertTrue(Arrays.equals(toTest.get(four), buffer));
 		assertTrue(Arrays.equals(toTest.get(one), new byte[] { 0, 2, 4, 6, 8,
-				1, 3, 5, 7, 9 }));
-		assertTrue(Arrays.equals(toTest.get(two), new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
+				1, 3, 5}));
+		assertTrue(Arrays.equals(toTest.get(two), new byte[] { 0, 1, 2, 3, 4, 5, 6, 7}));
 		assertTrue(Arrays.equals(toTest.get(three), new byte[] { 9, 8, 7, 6, 5,
-				4, 3, 2, 1, 0 }));
+				4, 3, 2}));
 
 		exceptionOccured = false;
 		try {
-			buffer = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			buffer = new byte[] { 9, 8, 7, 6, 5, 4, 3, 2};
 			three = toTest.addToFront(buffer);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -411,7 +426,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			toTest.addToFront(new byte[] { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+			toTest.addToFront(new byte[] { 3, 3, 3, 3, 3, 3, 3, 3, 3,
 					3, 3 });
 		} catch (Throwable e) {
 			exceptionOccured = true;
@@ -420,7 +435,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			toTest.addToFront(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+			toTest.addToFront(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7});
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -428,7 +443,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			toTest.addToFront(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+			toTest.addToFront(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7});
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -436,7 +451,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		exceptionOccured = false;
 		try {
-			toTest.addToFront(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+			toTest.addToFront(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7});
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -445,7 +460,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			toTest.close();
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 449" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -455,8 +471,10 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 	public void testMoveToFront() {
 		try {
-			PersistentDoubleLinkList.delete(FILENAME);
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 472" + FILE_NUMBER++);
 		} catch (Throwable e) {
+//			e.printStackTrace();
 		}
 
 		PersistentDoubleLinkList toTest = null;
@@ -469,25 +487,19 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		exceptionOccured = false;
-		try {
-			toTest.moveToFront(1);
-		} catch(Throwable e) {
-			exceptionOccured = true;
-		}
-		assertTrue(exceptionOccured);
 		assertEquals(0,toTest.getLength());
 		long indexOne = 0, indexTwo = 0, indexThree = 0;
 		exceptionOccured = false;
+		byte[] bufferOne = new byte[]{1,2,3,4,5,6,7,8};
 		try {
-			indexOne = toTest.addToFront(new byte[]{1,2,3,4,5,6,7,8,9,0});
+			indexOne = toTest.addToFront(bufferOne);
 		} catch(Throwable e) {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
 		
 
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
 		
 		exceptionOccured = false;
 		try {
@@ -497,19 +509,20 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		}
 		assertFalse(exceptionOccured);
 
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
 		
 		exceptionOccured = false;
+		byte[] bufferTwo = new byte[]{6,7,8,9,0,1,2,3};
 		try {
-			indexTwo = toTest.addToFront(new byte[]{6,7,8,9,0,1,2,3,4,5});
+			indexTwo = toTest.addToFront(bufferTwo);
 		} catch(Throwable e) {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
 		
 
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
-		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
 		
 		exceptionOccured = false;
 		try {
@@ -518,8 +531,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
-		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
 		
 		exceptionOccured = false;
 		try {
@@ -529,27 +542,28 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		}
 		assertFalse(exceptionOccured);
 		assertEquals(1,toTest.getLength());
-		assertTrue(Arrays.equals(toTest.get(indexOne),new byte[]{1,2,3,4,5,6,7,8,9,0}));
+		assertTrue(Arrays.equals(toTest.get(indexOne),bufferOne));
 		
 		exceptionOccured = false;
 		try {
-			indexTwo = toTest.addToFront(new byte[]{6,7,8,9,0,1,2,3,4,5});
+			indexTwo = toTest.addToFront(bufferTwo);
 		} catch(Throwable e) {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
 		exceptionOccured = false;
+		byte[] bufferThree = new byte[]{2,4,6,8,0,1,3,5};
 		try {
-			indexThree = toTest.addToFront(new byte[]{2,4,6,8,0,1,3,5,7,9});
+			indexThree = toTest.addToFront(bufferThree);
 		} catch(Throwable e) {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
 		
 
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
-		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
-		assertTrue(Arrays.equals(new byte[]{2,4,6,8,0,1,3,5,7,9},toTest.get(indexThree)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferThree,toTest.get(indexThree)));
 		
 		exceptionOccured = false;
 		try {
@@ -558,9 +572,9 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
-		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
-		assertTrue(Arrays.equals(new byte[]{2,4,6,8,0,1,3,5,7,9},toTest.get(indexThree)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferThree,toTest.get(indexThree)));
 		
 		exceptionOccured = false;
 		try {
@@ -569,9 +583,9 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
-		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
-		assertTrue(Arrays.equals(new byte[]{2,4,6,8,0,1,3,5,7,9},toTest.get(indexThree)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferThree,toTest.get(indexThree)));
 		
 		exceptionOccured = false;
 		try {
@@ -580,8 +594,8 @@ public class PersistentDoubleLinkListTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		assertTrue(Arrays.equals(new byte[]{1,2,3,4,5,6,7,8,9,0},toTest.get(indexOne)));
-		assertTrue(Arrays.equals(new byte[]{6,7,8,9,0,1,2,3,4,5},toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
 		
 
 		assertEquals(2,toTest.getLength());
@@ -609,6 +623,68 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		
 		toTest.close();
 		
+	}
+	
+	public void testFile() {
+		try {
+			PersistentDoubleLinkList.delete(FILENAME); 
+			System.out.println("Deleted number 638" + FILE_NUMBER++);
+		} catch (Throwable e) {
+		}
+
+		PersistentDoubleLinkList toTest = null;
+		boolean exceptionOccured = false;
+		try {
+			PersistentDoubleLinkList.create(FILENAME, HEADER_SIZE, HEADER_SIZE);
+			toTest = PersistentDoubleLinkList.open(FILENAME);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		assertEquals(0,toTest.getLength());
+		long indexOne = 0, indexTwo = 0, indexThree = 0;
+		exceptionOccured = false;
+		byte[] bufferOne = new byte[]{1,2,3,4,5,6,7,8};
+		try {
+			indexOne = toTest.addToFront(bufferOne);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		
+		exceptionOccured = false;
+		byte[] bufferTwo = new byte[]{6,7,8,9,0,1,2,3};
+		try {
+			indexTwo = toTest.addToFront(bufferTwo);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
+		
+		
+		exceptionOccured = false;
+		byte[] bufferThree = new byte[]{2,4,6,8,0,1,3,5};
+		try {
+			indexThree = toTest.addToFront(bufferThree);
+		} catch(Throwable e) {
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+
+		assertTrue(Arrays.equals(bufferOne,toTest.get(indexOne)));
+		assertTrue(Arrays.equals(bufferTwo,toTest.get(indexTwo)));
+		assertTrue(Arrays.equals(bufferThree,toTest.get(indexThree)));
+		
+		toTest.close();
 	}
 
 }

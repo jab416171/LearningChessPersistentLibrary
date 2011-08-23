@@ -19,14 +19,12 @@ public class PersistentHashTable {
 	
 	private long hashSize; 
 	private long recordSize;
-	private byte[] EMPTY_KEY = null;
 	private static final long LOW_ORDER_MASK = 0x7FFFFFFFFFFFFFFFL;
 		 
 	private PersistentHashTable(String fileName){
 		persistentArray = PersistentArray.open(fileName);
 		recordSize = persistentArray.getRecordSize();
 		hashSize = new PersistentHashTableHeader(persistentArray.getHeader()).getTableLength();
-		EMPTY_KEY = new byte[(int)(recordSize-INFO_SIZE)];
 	}
 	
 	public static void create(String fileName, long keyLength, long tableLength){

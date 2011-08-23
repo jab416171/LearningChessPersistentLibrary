@@ -81,7 +81,11 @@ public class PersistentArray {
 		File fileArray = new File(fileName);
 		if(fileArray.exists()){
 			if(!fileArray.delete()) {
+				
 				throw new RuntimeException("The file, with file name " + fileName + ", failed to be deleted. (The stream might not be closed)");
+			}
+			else {
+				System.out.println("File was deleted");
 			}
 		}
 		else{

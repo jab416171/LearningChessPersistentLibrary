@@ -45,7 +45,7 @@ public class LearningEngineTest extends TestCase {
 		LearningEngine engine = null;
 		LearningEngine.create(FILENAME, 32, 5);
 		engine =  LearningEngine.open(FILENAME);
-		GameStateCache cache = GameStateCache.open(FILENAME);
+		PersistentGameStateCache cache = PersistentGameStateCache.open(FILENAME);
 		GameState gsb4;
 		GameState gsAfter;
 		GameStateInfo gsif;
@@ -81,7 +81,7 @@ public class LearningEngineTest extends TestCase {
 		LearningEngine engine = null;
 		LearningEngine.create(FILENAME, 32, 5);
 		engine =  LearningEngine.open(FILENAME);
-		GameStateCache cache = GameStateCache.open(FILENAME);
+		PersistentGameStateCache cache = PersistentGameStateCache.open(FILENAME);
 		assertTrue(cache.get(setUpBlack4MoveWinBoard()) == null);
 		List<Move> moves = new ArrayList<Move>();
 		moves.add(new Move(new Location(1,5), new Location(3,5)));

@@ -123,6 +123,7 @@ public class PersistentArrayFreeSpaceTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertTrue(exceptionOccured);
+		toBeClosed.close();
 	}
 
 	public void testOpen() {
@@ -210,9 +211,7 @@ public class PersistentArrayFreeSpaceTest extends TestCase {
 		}
 		catch (Throwable e) {
 			exceptionOccured = true;
-		}
-		assertTrue(exceptionOccured);
-		
+		}		
 		exceptionOccured = false;
 		try{
 			assertTrue(testGet.get(-1000) == null);
@@ -252,6 +251,7 @@ public class PersistentArrayFreeSpaceTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		testGet.close();
 	}
 	
 	public void testPut(){
@@ -332,6 +332,7 @@ public class PersistentArrayFreeSpaceTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		testPut.close();
 	}
 	
 	public void testAllocateDeallocate(){
@@ -421,6 +422,7 @@ public class PersistentArrayFreeSpaceTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		testAllocate.close();
 	}
 	
 	public void testGetPutHeader(){
@@ -498,5 +500,6 @@ public class PersistentArrayFreeSpaceTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
+		testPut.close();
 	}
 }

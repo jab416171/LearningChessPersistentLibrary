@@ -1,13 +1,11 @@
 package edu.neumont.learningChess.engine.persistence;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public class PersistentArrayWithFreeSpace {
 	
 	private PersistentArray persistentArray;
 	private PersistentArrayWithFreeSpaceHeader header;
-	private static final long LONG_SIZE = 8;
 	private static final long END_OF_LIST = -1;
 	
 

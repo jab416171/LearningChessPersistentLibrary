@@ -12,14 +12,14 @@ public class GameStateCacheTest extends TestCase {
 	public void testCreate() {
 		boolean exceptionOccured = false;
 		try{
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 		}
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 10, 10);
+			PersistentGameStateCache.create(FILENAME, 10, 10);
 		}
 		catch(Throwable e){
 			e.printStackTrace();
@@ -29,8 +29,8 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.open(FILENAME).close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.open(FILENAME).close();
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -39,7 +39,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, Long.MAX_VALUE, Long.MAX_VALUE);
+			PersistentGameStateCache.create(FILENAME, Long.MAX_VALUE, Long.MAX_VALUE);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -49,7 +49,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 10000, 10000);
+			PersistentGameStateCache.create(FILENAME, 10000, 10000);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -58,8 +58,8 @@ public class GameStateCacheTest extends TestCase {
 
 		exceptionOccured = false;
 		try{
-			GameStateCache.open(FILENAME).close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.open(FILENAME).close();
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -68,7 +68,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, -1, Long.MAX_VALUE);
+			PersistentGameStateCache.create(FILENAME, -1, Long.MAX_VALUE);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -77,7 +77,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, Long.MIN_VALUE, Long.MIN_VALUE);
+			PersistentGameStateCache.create(FILENAME, Long.MIN_VALUE, Long.MIN_VALUE);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -86,7 +86,7 @@ public class GameStateCacheTest extends TestCase {
 
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, Long.MAX_VALUE, -1);
+			PersistentGameStateCache.create(FILENAME, Long.MAX_VALUE, -1);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -94,7 +94,7 @@ public class GameStateCacheTest extends TestCase {
 		assertTrue(exceptionOccured);
 		
 		try{ 
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 		}
 	}
@@ -103,17 +103,17 @@ public class GameStateCacheTest extends TestCase {
 		
 		boolean exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 0, 0);
+			PersistentGameStateCache.create(FILENAME, 0, 0);
 		}
 		catch(Throwable e){
 			e.printStackTrace();
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		GameStateCache toDelete = null;
+		PersistentGameStateCache toDelete = null;
 		exceptionOccured = false;
 		try{
-			toDelete = GameStateCache.open(FILENAME);
+			toDelete = PersistentGameStateCache.open(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -122,7 +122,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -132,7 +132,7 @@ public class GameStateCacheTest extends TestCase {
 		exceptionOccured = false;
 		try{
 			toDelete.close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -141,7 +141,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -152,7 +152,7 @@ public class GameStateCacheTest extends TestCase {
 	public void testOpen() {
 		boolean exceptionOccured = false;
 		try{
-			GameStateCache.open(FILENAME);
+			PersistentGameStateCache.open(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -161,16 +161,16 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 32, 10);
+			PersistentGameStateCache.create(FILENAME, 32, 10);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		GameStateCache toCloseLinkList = null;
+		PersistentGameStateCache toCloseLinkList = null;
 		exceptionOccured = false;
 		try{
-			toCloseLinkList = GameStateCache.open(FILENAME);
+			toCloseLinkList = PersistentGameStateCache.open(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -180,7 +180,7 @@ public class GameStateCacheTest extends TestCase {
 		exceptionOccured = false;
 		try{
 			toCloseLinkList.close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -189,7 +189,7 @@ public class GameStateCacheTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			GameStateCache.open(FILENAME);
+			PersistentGameStateCache.open(FILENAME);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -200,14 +200,14 @@ public class GameStateCacheTest extends TestCase {
 	
 	public void testGet() {
 		try{
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 		}
-		GameStateCache toTest = null;
+		PersistentGameStateCache toTest = null;
 		boolean exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 32, 5);
-			toTest = GameStateCache.open(FILENAME);
+			PersistentGameStateCache.create(FILENAME, 32, 5);
+			toTest = PersistentGameStateCache.open(FILENAME);
 		}catch(Throwable e){
 			exceptionOccured = true;
 		}
@@ -352,7 +352,7 @@ public class GameStateCacheTest extends TestCase {
 		exceptionOccured = false;
 		try{
 			toTest.close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 			exceptionOccured = true;
 		}
@@ -361,14 +361,14 @@ public class GameStateCacheTest extends TestCase {
 
 	public void testPut() {
 		try{
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 		}
-		GameStateCache toTest = null;
+		PersistentGameStateCache toTest = null;
 		boolean exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 32, 5);
-			toTest = GameStateCache.open(FILENAME);
+			PersistentGameStateCache.create(FILENAME, 32, 5);
+			toTest = PersistentGameStateCache.open(FILENAME);
 		}catch(Throwable e){
 			exceptionOccured = true;
 		}
@@ -537,7 +537,7 @@ public class GameStateCacheTest extends TestCase {
 		exceptionOccured = false;
 		try{
 			toTest.close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 			exceptionOccured = true;
 		}
@@ -546,14 +546,14 @@ public class GameStateCacheTest extends TestCase {
 
 	public void testRemove() {
 		try{
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 		}
-		GameStateCache toTest = null;
+		PersistentGameStateCache toTest = null;
 		boolean exceptionOccured = false;
 		try{
-			GameStateCache.create(FILENAME, 32, 10);
-			toTest = GameStateCache.open(FILENAME);
+			PersistentGameStateCache.create(FILENAME, 32, 10);
+			toTest = PersistentGameStateCache.open(FILENAME);
 		}catch(Throwable e){
 			exceptionOccured = true;
 		}
@@ -702,7 +702,7 @@ public class GameStateCacheTest extends TestCase {
 		exceptionOccured = false;
 		try{
 			toTest.close();
-			GameStateCache.delete(FILENAME);
+			PersistentGameStateCache.delete(FILENAME);
 		}catch(Throwable e){
 			exceptionOccured = true;
 		}

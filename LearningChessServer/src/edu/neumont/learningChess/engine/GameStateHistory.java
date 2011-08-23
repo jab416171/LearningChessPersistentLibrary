@@ -1,20 +1,29 @@
 package edu.neumont.learningChess.engine;
 
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
-import edu.neumont.learningChess.model.Move;
+import edu.neumont.chessModel.Movement.Move;
 
-public class GameStateHistory {
-	//Holds a list of game states for a single fininished game
+public class GameStateHistory implements Enumeration<Move>{
+	//Holds a list of game states for a single finished game
 	
-	List<Move> moves;
+	private List<Move> moves;
+	private Iterator<Move> iter;
 	
 	public GameStateHistory(List<Move> moves) {
 		this.moves = moves;
+		iter = moves.iterator();
 	}
-	
-	public List<Move> getMoves()
-	{
-		return moves;
+
+	@Override
+	public boolean hasMoreElements() {
+		return iter.hasNext();
+	}
+
+	@Override
+	public Move nextElement() {
+		return iter.next();
 	}
 }

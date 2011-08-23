@@ -2,19 +2,17 @@ package edu.neumont.learningChess.engine;
 
 import java.nio.ByteBuffer;
 
-import edu.neumont.learningChess.model.Team;
+import edu.neumont.chessModel.Board.Team;
 
 
 public class GameStateInfo {
 	
 	private byte[] gameStateBuffer;
-	private byte[] serializedGameStateInfo;
 	private float average, count;
 	private static final int FLOAT_SIZE = 4;
 
 	public GameStateInfo(byte[] buffer){
-		serializedGameStateInfo = buffer;
-		deserialize();
+		deserialize(buffer);
 	}
 	
 	public GameStateInfo(byte[] gamestate, float average, float count ) 
@@ -34,16 +32,17 @@ public class GameStateInfo {
 		serialize();
 	}
 	
-	private void serialize(){
-		serializedGameStateInfo = new byte[gameStateBuffer.length + (2*FLOAT_SIZE)];
-		ByteBuffer byteBuffer = ByteBuffer.wrap(serializedGameStateInfo);
+	private byte[] serialize(){
+		byte[] buffer = new byte[gameStateBuffer.length + (2*FLOAT_SIZE)];
+		ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 		byteBuffer.putFloat(average);
 		byteBuffer.putFloat(count);
 		byteBuffer.put(gameStateBuffer);
+		return buffer;
 	}
 	
-	private void deserialize() {
-		ByteBuffer byteBuffer = ByteBuffer.wrap(serializedGameStateInfo);
+	private void deserialize(byte[] buffer) {
+		ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 		average = byteBuffer.getFloat();
 		count = byteBuffer.getFloat();
 		gameStateBuffer = new byte[byteBuffer.remaining()];
@@ -51,18 +50,18 @@ public class GameStateInfo {
 	}
 
 
-	public GameState getGameState() {
-		Team white = new Team(Team.Color.LIGHT);
-		Team black = new Team(Team.Color.DARK);
-		return new GameState(gameStateBuffer, white, black);
-	}
+//	public GameState getGameState() {
+//		Team white = new Team(Team.Color.LIGHT);
+//		Team black = new Team(Team.Color.DARK);
+//		return new GameState(gameStateBuffer, white, black);
+//	}
 	
 	public byte[] getGameStateBuffer(){
 		return gameStateBuffer;
 	}
 
 	public byte[] getSerializedGameStateInfo() {
-		return serializedGameStateInfo;
+		return serialize();
 	}
 
 	public float getAverage() {
