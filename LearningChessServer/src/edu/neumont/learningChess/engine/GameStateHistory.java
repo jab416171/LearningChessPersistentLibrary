@@ -14,7 +14,7 @@ public class GameStateHistory implements Enumeration<Move>{
 	
 	public GameStateHistory(List<Move> moves) {
 		this.moves = moves;
-		iter = moves.iterator();
+		iter = this.moves.iterator();
 	}
 
 	@Override

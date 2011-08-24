@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="C:/Users/jbass/ChessModel/ChessModel.jar"/>
+	<classpathentry kind="lib" path="C:/Users/jbass/Documents/school/Quarter 8/Sprint 2/PRO380/persistence.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
