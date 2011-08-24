@@ -2,8 +2,6 @@ package edu.neumont.learningChess.engine;
 
 import java.nio.ByteBuffer;
 
-import edu.neumont.chessModel.Board.Team;
-
 
 public class GameStateInfo {
 	

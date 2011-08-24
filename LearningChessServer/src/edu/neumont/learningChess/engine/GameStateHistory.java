@@ -4,7 +4,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.neumont.chessModel.Movement.Move;
+import edu.neumont.chessModel.movement.Move;
 
 public class GameStateHistory implements Enumeration<Move>{
 	//Holds a list of game states for a single finished game

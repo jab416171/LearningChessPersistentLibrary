@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-import edu.neumont.chessModel.Board.ChessBoard;
-import edu.neumont.chessModel.Movement.Move;
+import edu.neumont.chessModel.board.ChessBoard;
+import edu.neumont.chessModel.game.ChessGame;
+import edu.neumont.chessModel.movement.Move;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
 public class LearningEngine{
 
@@ -42,7 +43,7 @@ public class LearningEngine{
 		return result.getMove();
 	}
 	
-	public void analyzeGameHistory(ChessGameHistory history){
+	public void analyzeGameHistory(GameStateHistory history){
 		List<Move> moves = history.getMoves();
 		int count = 0;
 		Move currentMove = moves.get(count ++);

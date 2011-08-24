@@ -1,5 +1,6 @@
 package edu.neumont.learningChess.engine.persistence;
 
+import edu.neumont.chessModel.game.ChessGame;
 import edu.neumont.learningChess.engine.GameStateInfo;
 
 public class PersistentGameStateCache {
@@ -33,14 +34,18 @@ public class PersistentGameStateCache {
 		cache.close();
 	}
 	
-	public void put(Game key, GameStateInfo value) {
-		cache.put(key.serialize(), value.getGameStateBuffer());
+	public void put(ChessGame key, GameStateInfo value) {
+		
+		cache.put(serialize(key), value.getGameStateBuffer());
 	}
 	
-	public GameStateInfo get(Game key) {
-		GameStateInfo gsi = new GameStateInfo(cache.get(key.serialize()));
+	public GameStateInfo get(ChessGame key) {
+		GameStateInfo gsi = new GameStateInfo(cache.get(serialize(key)));
 		return gsi;
 	}
 	
-	
+	private byte[] serialize(ChessGame game) {
+		byte[] seralizedGame = null;
+		return seralizedGame;
+	}
 }
