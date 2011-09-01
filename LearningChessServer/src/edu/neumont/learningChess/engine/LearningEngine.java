@@ -5,12 +5,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
+import java.util.Vector;
 
 import edu.neumont.learningChess.api.ChessGame;
 import edu.neumont.learningChess.api.ChessGameState;
 import edu.neumont.learningChess.api.ExtendedMove;
 import edu.neumont.learningChess.api.Move;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
+import edu.neumont.learningChess.model.GameStateHistory;
 public class LearningEngine {
 
 	private PersistentGameStateCache persistence;
@@ -44,13 +46,12 @@ public class LearningEngine {
 
 	public void analyzeGameHistory(GameStateHistory history) {
 		ChessGame current = new ChessGame();
+		Enumeration<ChessGameState> gameStateHistories = history.getAllHistories();
 		Stack<ChessGameState> historyStack = new Stack<ChessGameState>();
-		while (history.hasMoreElements()) {
-			ExtendedMove currentMove = history.nextElement();
-			historyStack.add(current.getGameState());
+		while (gameStateHistories.hasMoreElements()) {
+			ChessGameState currentMove = gameStateHistories.nextElement();
+			current.setGameState(currentMove);
 			if (!(current.isCheckMate() || current.isStaleMate())) {
-				
-				current.makeMove(current.getMoveDescription(currentMove, new PromotionListener(currentMove.getPromotionPieceType())));
 				historyStack.add(current.getGameState());
 			}
 		}
