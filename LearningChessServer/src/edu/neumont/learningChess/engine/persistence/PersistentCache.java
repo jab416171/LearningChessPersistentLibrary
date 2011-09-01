@@ -65,6 +65,7 @@ public class PersistentCache {
 		long index = hashTable.get(key);
 		if(index >= 0) {
 			value = linkedList.get(index);
+			linkedList.moveToFront(index);
 		}
 		return value;
 	}
@@ -89,11 +90,6 @@ public class PersistentCache {
 
 
 	public byte[] getHeader() {
-		// TODO Auto-generated method stub
-		return null;
+		return header.serialize();
 	}
-
-
-	
-	
 }

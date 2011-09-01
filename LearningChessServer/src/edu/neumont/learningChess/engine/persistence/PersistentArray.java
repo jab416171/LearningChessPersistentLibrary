@@ -3,6 +3,7 @@ package edu.neumont.learningChess.engine.persistence;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.RandomAccessFile;
 
 public class PersistentArray {
@@ -37,24 +38,6 @@ public class PersistentArray {
 		
 	}
 	
-//	private void readHeaderSize()  {
-//		try {
-//			arrayStream.seek(HEADER_SIZE_OFFSET);
-//			headerSize = arrayStream.readLong();
-//		} catch (IOException e) {
-//			headerSize = 0;
-//		}
-//	}
-//
-//	private void writeHeaderSize() {
-//		try {
-//			arrayStream.seek(HEADER_SIZE_OFFSET);
-//			arrayStream.writeLong(headerSize);
-//		} catch (IOException e) {
-//			throw new RuntimeException("Failure to write size of header.", e);
-//		}
-//	}
-
 	public static void create(String fileName, long recordSize, long headerSize){
 		if(fileName.isEmpty() || fileName == null){
 			throw new RuntimeException("Invalid file name: " + fileName + ".");
@@ -83,9 +66,6 @@ public class PersistentArray {
 			if(!fileArray.delete()) {
 				
 				throw new RuntimeException("The file, with file name " + fileName + ", failed to be deleted. (The stream might not be closed)");
-			}
-			else {
-				System.out.println("File was deleted");
 			}
 		}
 		else{
@@ -128,7 +108,7 @@ public class PersistentArray {
 	
 	public void put (long index, byte[] buffer){
 		if(buffer.length > header.getClientRecordSize())
-			throw new RuntimeException("The buffer being put is larger than record size. Size mismatch error.");
+			throw new RuntimeException("The buffer being put is larger than record size. Size mismatch error. Buffer length: " + buffer.length + ", header size: " + header.getClientHeaderSize());
 		if(index >= (Long.MAX_VALUE - 1) || index < 0)
 			throw new RuntimeException("Put location error, index was " + index);
 		try {
@@ -173,19 +153,19 @@ public class PersistentArray {
 	
 	
 	
-	public void printFile(){
+	public void printFile(PrintStream printStream){
 
-		System.out.println("Start print file----------------");
+		printStream.println("Start print file----------------");
 		try {
 			arrayStream.seek(0);
 			for (int i = 0; i < arrayStream.length(); i++) {
-				System.out.println( i + ": " + arrayStream.read());
+				printStream.println( i + ": " + arrayStream.read());
 			}
 		} catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
-		System.out.println("end print file----------------");
+		printStream.println("end print file----------------");
 	}
 	
 	

@@ -25,7 +25,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		boolean exceptionOccured = false;
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 28" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 
@@ -42,7 +41,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		try {
 			PersistentDoubleLinkList.open(FILENAME).close();
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 44" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -69,7 +67,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		try {
 			PersistentDoubleLinkList.open(FILENAME).close();
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 70" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -102,7 +99,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 102" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 		
@@ -111,7 +107,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	public void testDelete() {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 110" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 		boolean exceptionOccured = false;
@@ -134,7 +129,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 132" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -144,7 +138,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		try {
 			toDelete.close();
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 141" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -153,7 +146,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		exceptionOccured = false;
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 149" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -190,7 +182,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		try {
 			toCloseLinkList.close();
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 185" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -235,7 +226,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	public void testPutGetHeader() {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 229" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 
@@ -258,7 +248,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	public void testRemoveFromBack() {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 261" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 
@@ -340,7 +329,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	public void testAddToFront() {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 343" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -461,7 +449,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		try {
 			toTest.close();
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 449" + FILE_NUMBER++);
 		} catch (Throwable e) {
 			exceptionOccured = true;
 		}
@@ -472,7 +459,6 @@ public class PersistentDoubleLinkListTest extends TestCase {
 	public void testMoveToFront() {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 472" + FILE_NUMBER++);
 		} catch (Throwable e) {
 //			e.printStackTrace();
 		}
@@ -625,10 +611,32 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		
 	}
 	
+	public void testUpdate() {
+		try {
+			PersistentDoubleLinkList.delete(FILENAME); 
+		} catch (Throwable e) {
+		}
+
+		PersistentDoubleLinkList toTest = null;
+		boolean exceptionOccured = false;
+		try {
+			PersistentDoubleLinkList.create(FILENAME, HEADER_SIZE, HEADER_SIZE);
+			toTest = PersistentDoubleLinkList.open(FILENAME);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+		toTest.addToFront(new byte[]{0,1,2,3,4,5,6,7});
+		toTest.update(0,new byte[]{1,1,2,3,4,5,6,6});
+		
+		toTest.close();
+	}
+	
 	public void testFile() {
 		try {
 			PersistentDoubleLinkList.delete(FILENAME); 
-			System.out.println("Deleted number 638" + FILE_NUMBER++);
 		} catch (Throwable e) {
 		}
 

@@ -1,5 +1,6 @@
 package edu.neumont.learningChess.engine.persistence;
 
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 
 public class PersistentArrayWithFreeSpace {
@@ -102,8 +103,8 @@ public class PersistentArrayWithFreeSpace {
 		putLocalHeader();
 	}
 	
-	public void printFile(){
-		persistentArray.printFile();
+	public void printFile(PrintStream printStream){
+		persistentArray.printFile(printStream);
 	}
 
 	

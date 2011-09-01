@@ -1,5 +1,6 @@
 package edu.neumont.learningChess.engine.persistence;
 
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -98,9 +99,9 @@ public class PersistentHashTable {
 		return toRemove.value;
 	}
 	
-	public void printFile()
+	public void printFile(PrintStream printStream)
 	{
-		persistentArray.printFile();
+		persistentArray.printFile(printStream);
 	}
 	
 	public long getHash(byte[] toHash){

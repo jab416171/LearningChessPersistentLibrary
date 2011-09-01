@@ -416,4 +416,66 @@ public class PersistArrayTest extends TestCase {
 		}
 		assertFalse(exceptionOccured);
 	}
+	
+
+	public void testRemove() {
+		PersistentArray testArray = null;
+		boolean exceptionOccured = false;
+		clearContents();
+		try{
+			PersistentArray.create(FILENAME, 10, 10);
+			testArray = PersistentArray.open(FILENAME);
+		}catch(Throwable e){
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		exceptionOccured = false;
+		
+		testArray.put(0, new byte[]{1,2,3,4,5,6,7,8,9,0});
+		testArray.put(1, new byte[]{2,2,3,4,5,6,7,8,9,0});
+		testArray.put(2, new byte[]{3,3,3,4,5,6,7,8,9,0});
+		testArray.put(3, new byte[]{4,4,4,4,5,6,7,8,9,0});
+		assertEquals(testArray.count(),4);
+		testArray.remove(0);
+		testArray.remove(0);
+		testArray.remove(0);
+		testArray.remove(0);
+		assertEquals(testArray.count(),4);
+		try{
+			testArray.close();
+			PersistentArray.delete(FILENAME);
+		}catch(Throwable e){
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+	}
+	
+	public void testGetRecordSize() {
+		PersistentArray testArray = null;
+		boolean exceptionOccured = false;
+		clearContents();
+		try{
+			PersistentArray.create(FILENAME, 10, 10);
+			testArray = PersistentArray.open(FILENAME);
+		}catch(Throwable e){
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		exceptionOccured = false;
+		
+		testArray.put(0, new byte[]{1,2,3,4,5,6,7,8,9,0});
+		testArray.put(1, new byte[]{2,2,3,4,5,6,7,8,9,0});
+		testArray.put(2, new byte[]{3,3,3,4,5,6,7,8,9,0});
+		testArray.put(3, new byte[]{4,4,4,4,5,6,7,8,9,0});
+		testArray.getRecordSize();
+		try{
+			testArray.close();
+			PersistentArray.delete(FILENAME);
+		}catch(Throwable e){
+			exceptionOccured = true;
+		}
+		assertFalse(exceptionOccured);
+		
+	}
 }

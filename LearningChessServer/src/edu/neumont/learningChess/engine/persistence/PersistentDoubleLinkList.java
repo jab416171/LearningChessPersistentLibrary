@@ -1,5 +1,7 @@
 package edu.neumont.learningChess.engine.persistence;
 
+import java.io.PrintStream;
+
 
 public class PersistentDoubleLinkList {
 
@@ -179,8 +181,8 @@ public class PersistentDoubleLinkList {
 		persistentArrayFS.putHeader(buffer);
 	}
 	
-	public void printFile(){
-		persistentArrayFS.printFile();
+	public void printFile(PrintStream printStream){
+		persistentArrayFS.printFile(printStream);
 	}
 
 	public void update(long index, byte[] value) {
