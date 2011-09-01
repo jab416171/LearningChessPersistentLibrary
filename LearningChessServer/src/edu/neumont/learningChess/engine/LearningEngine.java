@@ -1,116 +1,108 @@
 package edu.neumont.learningChess.engine;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
-import edu.neumont.chessModel.board.ChessBoard;
-import edu.neumont.chessModel.game.ChessGame;
-import edu.neumont.chessModel.movement.Move;
+import edu.neumont.learningChess.api.ChessGame;
+import edu.neumont.learningChess.api.ChessGameState;
+import edu.neumont.learningChess.api.ExtendedMove;
+import edu.neumont.learningChess.api.Move;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
-public class LearningEngine{
+public class LearningEngine {
 
 	private PersistentGameStateCache persistence;
+	private Random random = new Random();
 
 	private LearningEngine(PersistentGameStateCache cache) {
 		persistence = cache;
 	}
-	
-	public static void create(String fileName, long recordSize, long maxListSize){
+
+	public static void create(String fileName, long recordSize, long maxListSize) {
 		PersistentGameStateCache.create(fileName, recordSize, recordSize, maxListSize);
 	}
-	
-	public static void delete(String fileName){
+
+	public static void delete(String fileName) {
 		PersistentGameStateCache.delete(fileName);
 	}
-	
-	
-	public static LearningEngine open(String fileName){
+
+	public static LearningEngine open(String fileName) {
 		LearningEngine ai = new LearningEngine(PersistentGameStateCache.open(fileName));
 		return ai;
 	}
-	
-	
-	public void close(){
+
+	public void close() {
 		persistence.close();
 	}
-	
-	
-	public Move getMove(ChessGame ChessGame){
-		GameController control = new GameController(ChessGame);
-		SearchResult result = findBestMove( control);
-		return result.getMove();
+
+	public Move getMove(ChessGame ChessGame) {
+		SearchResult result = findBestMove(ChessGame);
+		return result == null ? null : result.getMove();
 	}
-	
-	public void analyzeGameHistory(GameStateHistory history){
-		List<Move> moves = history.getMoves();
-		int count = 0;
-		Move currentMove = moves.get(count ++);
-		GameController controller = new GameController( new NullDisplay() );
-		ChessGame current = controller.getChessGame();
-		Stack<ChessGame> historyStack = new Stack<ChessGame>();
-		historyStack.add(current);
-		while(!(controller.isCheckmate() || controller.isStalemate())){
-			controller.play(currentMove);
-			if(moves.size() != count)
-				currentMove = moves.get(count ++);
-			historyStack.add(controller.getChessGame());
+
+	public void analyzeGameHistory(GameStateHistory history) {
+		ChessGame current = new ChessGame();
+		Stack<ChessGameState> historyStack = new Stack<ChessGameState>();
+		while (history.hasMoreElements()) {
+			ExtendedMove currentMove = history.nextElement();
+			historyStack.add(current.getGameState());
+			if (!(current.isCheckMate() || current.isStaleMate())) {
+				
+				current.makeMove(current.getMoveDescription(currentMove, new PromotionListener(currentMove.getPromotionPieceType())));
+				historyStack.add(current.getGameState());
+			}
 		}
-		if(controller.isCheckmate()){
-			analyzeStack(historyStack);                    
-		}
-		else if(controller.isStalemate()){
-			analyzeStaleStack(historyStack);  
-		}
-		else
+		if (current.isCheckMate()) {
+			analyzeStack(historyStack);
+		} else if (current.isStaleMate()) {
+			analyzeStaleStack(historyStack);
+		} else
 			throw new RuntimeException("Run out of moves without being in stalemate or checkmate.");
-		
 	}
-	
-	private void analyzeStack(Stack<ChessGame> historyStack){
-		int denominator =  (int)Math.floor(historyStack.size()/2.0);
+
+	private void analyzeStack(Stack<ChessGameState> historyStack) {
+		int denominator = (int) Math.floor(historyStack.size() / 2.0);
 		boolean winner = false;
 		int count = denominator;
-		while(historyStack.size() > 1){
-			ChessGame current = historyStack.pop();
-			float value = count/denominator * (winner ? 1 : -1);
-			ChessGameInfo toUpdate = persistence.get(current);
-			if(toUpdate == null)
-				toUpdate = new ChessGameInfo(current.serialize(), 0 ,0);
+		while (historyStack.size() > 1) {
+			ChessGameState current = historyStack.pop();
+			float value = count / (denominator * (winner ? 1 : -1));
+			GameStateInfo toUpdate = persistence.get(current);
+			if (toUpdate == null)
+				toUpdate = new GameStateInfo(0, 0);
 			toUpdate.addObservation(value);
-			persistence.put(toUpdate);
-			if(winner)
-				count --;
+			persistence.put(current, toUpdate);
+			if (winner)
+				count--;
 			winner = !winner;
 		}
 	}
-	
-	private void analyzeStaleStack(Stack<ChessGame> historyStack){
-		while(historyStack.size() > 1){
-			ChessGame current = historyStack.pop();
-			ChessGameInfo toUpdate = persistence.get(current);
+
+	private void analyzeStaleStack(Stack<ChessGameState> historyStack) {
+		while (historyStack.size() > 1) {
+			ChessGameState current = historyStack.pop();
+			GameStateInfo toUpdate = persistence.get(current);
 			toUpdate.addObservation(0);
-			persistence.put(toUpdate);
+			persistence.put(current, toUpdate);
 		}
 	}
-	
-	
-	
-	private SearchResult findBestMove( GameController gc) {
-		ArrayList<SearchResult> results = null;
+
+	private SearchResult findBestMove(ChessGame game) {
+		List<SearchResult> results = null;
 		float bestValue = 0;
-		ChessBoard board = gc.getBoard();
-		for (Iterator<Move> i = gc.getCurrentTeam().getMoves(board); i.hasNext(); ) {
-			Move move = i.next();
-			board.tryMove(move);
-			float moveValue = getBoardValue(gc);
-			board.undoTriedMove();
+
+		for (Enumeration<Move> possibleMoves = game.getPossibleMoves(); possibleMoves.hasMoreElements();) {
+			Move move = possibleMoves.nextElement();
+			game.makeMove(game.getMoveDescription(move, null));
+			float moveValue = getBoardValue(game.getGameState());
+			game.unMakeMove();
 			if ((results == null) || (moveValue > bestValue)) {
 				SearchResult result = new SearchResult(move, moveValue);
-				
+
 				results = new ArrayList<SearchResult>();
-				
+
 				results.add(result);
 				bestValue = moveValue;
 			} else if (moveValue == bestValue) {
@@ -121,12 +113,11 @@ public class LearningEngine{
 		if ((results == null) || (results.size() == 0))
 			return null;
 		else
-			return results.get(SingletonRandom.nextInt(results.size()));
+			return results.get(random.nextInt(results.size()));
 	}
-	
-	private float getBoardValue(GameController gc) {
-		ChessGame ChessGame = gc.getChessGame();
-		ChessGameInfo info = persistence.get(ChessGame);
+
+	private float getBoardValue(ChessGameState chessGameState) {
+		GameStateInfo info = persistence.get(chessGameState);
 		return info != null ? info.getAverage() : 0;
 	}
 
@@ -139,5 +130,5 @@ public class LearningEngine{
 			return move;
 		}
 	}
-	
+
 }

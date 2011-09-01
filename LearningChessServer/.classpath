@@ -5,7 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="persistence.jar"/>
-	<classpathentry kind="lib" path="ChessModel.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Chess Improved"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

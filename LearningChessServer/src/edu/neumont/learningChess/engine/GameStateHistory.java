@@ -4,17 +4,17 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.neumont.chessModel.movement.Move;
+import edu.neumont.learningChess.api.ExtendedMove;
 
-public class GameStateHistory implements Enumeration<Move>{
+public class GameStateHistory implements Enumeration<ExtendedMove>{
 	//Holds a list of game states for a single finished game
 	
-	private List<Move> moves;
-	private Iterator<Move> iter;
+	private List<ExtendedMove> ExtendedMoves;
+	private Iterator<ExtendedMove> iter;
 	
-	public GameStateHistory(List<Move> moves) {
-		this.moves = moves;
-		iter = this.moves.iterator();
+	public GameStateHistory(List<ExtendedMove> ExtendedMoves) {
+		this.ExtendedMoves = ExtendedMoves;
+		iter = this.ExtendedMoves.iterator();
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class GameStateHistory implements Enumeration<Move>{
 	}
 
 	@Override
-	public Move nextElement() {
+	public ExtendedMove nextElement() {
 		return iter.next();
 	}
 }
