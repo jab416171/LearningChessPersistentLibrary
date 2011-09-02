@@ -2,11 +2,8 @@ package tests;
 
 import java.util.Arrays;
 
-import com.sun.xml.internal.bind.v2.TODO;
-
-import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
-
 import junit.framework.TestCase;
+import edu.neumont.learningChess.engine.persistence.PersistentDoubleLinkList;
 
 public class PersistentDoubleLinkListTest extends TestCase {
 	private static final int HEADER_SIZE = 8;
@@ -262,7 +259,7 @@ public class PersistentDoubleLinkListTest extends TestCase {
 		}
 		assertFalse(exceptionOccured);
 		byte[] buffer = null;
-		long one = 0, two = 0, three = 0, four = 0;
+		long one = 0, two = 0, three = 0;
 		exceptionOccured = false;
 		try {
 			buffer = new byte[] { 0, 2, 4, 6, 8, 1, 3, 5};

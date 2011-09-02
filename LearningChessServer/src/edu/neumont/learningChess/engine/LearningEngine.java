@@ -1,18 +1,18 @@
 package edu.neumont.learningChess.engine;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
-import java.util.Vector;
 
 import edu.neumont.learningChess.api.ChessGame;
 import edu.neumont.learningChess.api.ChessGameState;
 import edu.neumont.learningChess.api.ExtendedMove;
+import edu.neumont.learningChess.api.IPromotionListener;
 import edu.neumont.learningChess.api.Move;
+import edu.neumont.learningChess.api.MoveDescription;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
-import edu.neumont.learningChess.model.GameStateHistory;
 public class LearningEngine {
 
 	private PersistentGameStateCache persistence;
@@ -44,17 +44,23 @@ public class LearningEngine {
 		return result == null ? null : result.getMove();
 	}
 
-	public void analyzeGameHistory(GameStateHistory history) {
+	public void analyzeGameHistory(Iterator<ExtendedMove> history) {
 		ChessGame current = new ChessGame();
-		Enumeration<ChessGameState> gameStateHistories = history.getAllHistories();
+		Iterator<ExtendedMove> gameStateHistories = history;
 		Stack<ChessGameState> historyStack = new Stack<ChessGameState>();
-		while (gameStateHistories.hasMoreElements()) {
-			ChessGameState currentMove = gameStateHistories.nextElement();
-			current.setGameState(currentMove);
+		while (gameStateHistories.hasNext()) {
+			ExtendedMove currentMove = gameStateHistories.next();
+			IPromotionListener promotionListener = new PromotionListener(currentMove.getPromotionPieceType());
+			MoveDescription moveDescription = current.getMoveDescription(currentMove, promotionListener);
+			if(moveDescription == null)
+				throw new RuntimeException("Illegal move: " + currentMove.toString());
+			current.makeMove(moveDescription);
 			if (!(current.isCheckMate() || current.isStaleMate())) {
 				historyStack.add(current.getGameState());
 			}
 		}
+		// TODO consider this
+//		historyStack = current.getGameStateHistory();
 		if (current.isCheckMate()) {
 			analyzeStack(historyStack);
 		} else if (current.isStaleMate()) {
@@ -94,8 +100,8 @@ public class LearningEngine {
 		List<SearchResult> results = null;
 		float bestValue = 0;
 
-		for (Enumeration<Move> possibleMoves = game.getPossibleMoves(); possibleMoves.hasMoreElements();) {
-			Move move = possibleMoves.nextElement();
+		for (Iterator<Move> possibleMoves = game.getPossibleMoves(); possibleMoves.hasNext();) {
+			Move move = possibleMoves.next();
 			game.makeMove(game.getMoveDescription(move, null));
 			float moveValue = getBoardValue(game.getGameState());
 			game.unMakeMove();
