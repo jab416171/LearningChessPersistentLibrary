@@ -1,8 +1,8 @@
 package edu.neumont.learningChess.engine.persistence;
 
 import edu.neumont.learningChess.api.ChessGameState;
-import edu.neumont.learningChess.api.SerializedChessGameState;
 import edu.neumont.learningChess.engine.GameStateInfo;
+import edu.neumont.learningChess.engine.SerializedChessGameState;
 
 public class PersistentGameStateCache {
 	private PersistentCache cache;
