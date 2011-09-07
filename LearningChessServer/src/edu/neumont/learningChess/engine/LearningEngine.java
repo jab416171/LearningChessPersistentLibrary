@@ -2,19 +2,15 @@ package edu.neumont.learningChess.engine;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Stack;
 
 import edu.neumont.learningChess.api.ChessGameState;
-import edu.neumont.learningChess.api.ExtendedMove;
 import edu.neumont.learningChess.api.MoveHistory;
 import edu.neumont.learningChess.controller.GameController;
-import edu.neumont.learningChess.controller.GameController.PlayerType;
 import edu.neumont.learningChess.controller.HistoryAnalyzer;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
 import edu.neumont.learningChess.model.ChessBoard;
 import edu.neumont.learningChess.model.Move;
-import edu.neumont.learningChess.model.ProxyPlayer;
 import edu.neumont.learningChess.model.SingletonRandom;
 public class LearningEngine implements HistoryAnalyzer {
 
