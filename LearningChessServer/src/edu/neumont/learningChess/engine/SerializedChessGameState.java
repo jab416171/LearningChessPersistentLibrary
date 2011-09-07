@@ -246,4 +246,8 @@ public class SerializedChessGameState {
 		PieceType pieceType = decodedPieceValues.get(value);
 		return new PieceDescription(teamColor, hasMoved, pieceType);
 	}
+
+	public static long getRecordSize() {
+		return BUFFER_SIZE;
+	}
 }
