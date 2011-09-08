@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Stack;
 
 import edu.neumont.learningChess.api.ChessGameState;
+import edu.neumont.learningChess.api.ExtendedMove;
 import edu.neumont.learningChess.api.MoveHistory;
 import edu.neumont.learningChess.controller.GameController;
 import edu.neumont.learningChess.controller.HistoryAnalyzer;
@@ -13,6 +14,7 @@ import edu.neumont.learningChess.model.ChessBoard;
 import edu.neumont.learningChess.model.ChessPiece;
 import edu.neumont.learningChess.model.ICheckChecker;
 import edu.neumont.learningChess.model.Move;
+import edu.neumont.learningChess.model.MoveDescription;
 import edu.neumont.learningChess.model.SingletonRandom;
 import edu.neumont.learningChess.model.Team;
 public class LearningEngine implements HistoryAnalyzer {
@@ -51,10 +53,13 @@ public class LearningEngine implements HistoryAnalyzer {
 		return persistence.get(gameState);
 	}
 
-	public void analyzeGameHistory(MoveHistory history) {
+	public int analyzeGameHistory(MoveHistory history) {
+		int size = history.getMoves().size();
 		GameController controller = new GameController(this, history);
 		controller.play();
+		return size;
 	}
+	
 	@Override
 	public void analyzeStack(Stack<ChessGameState> historyStack) {
 		int denominator = (int) Math.floor(historyStack.size() / 2.0);
@@ -84,17 +89,18 @@ public class LearningEngine implements HistoryAnalyzer {
 		}
 	}
 
-	private SearchResult findBestMove(GameController gc) {
+	private SearchResult findBestMove(GameController gameController) {
 		ArrayList<SearchResult> results = null;
 		float bestValue = 0;
-		ChessBoard board = gc.getBoard();
-		for (Iterator<Move> i = gc.getCurrentTeam().getMoves(board); i.hasNext();) {
-			Move move = i.next();
-			if(isLegalMove(move, board, gc, gc.getCurrentTeam())) {
-				board.tryMove(move);
-				float moveValue = getBoardValue(gc);
+		ChessBoard board = gameController.getBoard();
+		for (Iterator<Move> i = gameController.getCurrentTeam().getMoves(board); i.hasNext();) {
+			ExtendedMove move = new ExtendedMove(i.next());
+			if(isLegalMove(move, board, gameController, gameController.getCurrentTeam())) {
+				MoveDescription triedMove = board.tryMove(move);
+				float moveValue = getBoardValue(gameController);
 				board.undoTriedMove();
 				if ((results == null) || (moveValue > bestValue)) {
+					move.setPromotionPieceType(GameController.getPieceTypeFromChessPiece(triedMove.getPromotionPiece()));
 					SearchResult result = new SearchResult(move, moveValue);
 	
 					results = new ArrayList<SearchResult>();
@@ -107,7 +113,16 @@ public class LearningEngine implements HistoryAnalyzer {
 				}
 			}
 		}
-		return ((results == null) || (results.size() == 0)) ? null : results.get(SingletonRandom.nextInt(results.size()));
+		if(((results == null) || (results.size() == 0))) 
+			return null;
+		else {
+			SearchResult searchResult = results.get(SingletonRandom.nextInt(results.size()));
+//			if(gameController.getPiece(searchResult.move.getFrom()) instanceof Pawn) {
+//				
+//			}
+			
+			return searchResult;
+		}
 	}
 	
 	public boolean isLegalMove(Move move, ChessBoard board,ICheckChecker checkChecker, Team team) {
@@ -133,11 +148,11 @@ public class LearningEngine implements HistoryAnalyzer {
 	}
 
 	private class SearchResult {
-		private Move move;
-		public SearchResult(Move move, float value) {
+		private ExtendedMove move;
+		public SearchResult(ExtendedMove move, float value) {
 			this.move = move;
 		}
-		public Move getMove() {
+		public ExtendedMove getMove() {
 			return move;
 		}
 	}
