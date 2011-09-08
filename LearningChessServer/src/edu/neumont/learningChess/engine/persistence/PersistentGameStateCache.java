@@ -39,6 +39,8 @@ public class PersistentGameStateCache {
 	}
 	
 	public GameStateInfo get(ChessGameState key) {
+		if(cache.get(serialize(key)) == null)
+			return new GameStateInfo(0,0);
 		return new GameStateInfo(cache.get(serialize(key)));
 	}
 	
