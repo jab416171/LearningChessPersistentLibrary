@@ -10,8 +10,11 @@ import edu.neumont.learningChess.controller.GameController;
 import edu.neumont.learningChess.controller.HistoryAnalyzer;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
 import edu.neumont.learningChess.model.ChessBoard;
+import edu.neumont.learningChess.model.ChessPiece;
+import edu.neumont.learningChess.model.ICheckChecker;
 import edu.neumont.learningChess.model.Move;
 import edu.neumont.learningChess.model.SingletonRandom;
+import edu.neumont.learningChess.model.Team;
 public class LearningEngine implements HistoryAnalyzer {
 
 	private PersistentGameStateCache persistence;
@@ -87,23 +90,41 @@ public class LearningEngine implements HistoryAnalyzer {
 		ChessBoard board = gc.getBoard();
 		for (Iterator<Move> i = gc.getCurrentTeam().getMoves(board); i.hasNext();) {
 			Move move = i.next();
-			board.tryMove(move);
-			float moveValue = getBoardValue(gc);
-			board.undoTriedMove();
-			if ((results == null) || (moveValue > bestValue)) {
-				SearchResult result = new SearchResult(move, moveValue);
-
-				results = new ArrayList<SearchResult>();
-
-				results.add(result);
-				bestValue = moveValue;
-			} else if (moveValue == bestValue) {
-				SearchResult result = new SearchResult(move, moveValue);
-				results.add(result);
+			if(isLegalMove(move, board, gc, gc.getCurrentTeam())) {
+				board.tryMove(move);
+				float moveValue = getBoardValue(gc);
+				board.undoTriedMove();
+				if ((results == null) || (moveValue > bestValue)) {
+					SearchResult result = new SearchResult(move, moveValue);
+	
+					results = new ArrayList<SearchResult>();
+	
+					results.add(result);
+					bestValue = moveValue;
+				} else if (moveValue == bestValue) {
+					SearchResult result = new SearchResult(move, moveValue);
+					results.add(result);
+				}
 			}
 		}
 		return ((results == null) || (results.size() == 0)) ? null : results.get(SingletonRandom.nextInt(results.size()));
 	}
+	
+	public boolean isLegalMove(Move move, ChessBoard board,ICheckChecker checkChecker, Team team) {
+		ChessPiece movingPiece = board.getPiece(move.getFrom());
+		Team movingTeam = movingPiece.getTeam();
+		return (movingTeam == team) && movingPiece.isLegalMove(board, move) && !causesCheckmate(move, checkChecker, board, team);
+	}
+	
+	private boolean causesCheckmate(Move move, ICheckChecker checkChecker, ChessBoard board, Team team) {
+		board.tryMove(move);
+		boolean result = checkChecker.isInCheck(team);
+		board.undoTriedMove();
+		
+		return result;
+	}
+
+	
 
 	private float getBoardValue(GameController gc) {
 		ChessGameState gameState = gc.getCurrentGameState();
