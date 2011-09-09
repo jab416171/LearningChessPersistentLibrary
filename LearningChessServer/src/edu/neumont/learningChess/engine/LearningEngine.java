@@ -6,7 +6,9 @@ import java.util.Stack;
 
 import edu.neumont.learningChess.api.ChessGameState;
 import edu.neumont.learningChess.api.ExtendedMove;
+import edu.neumont.learningChess.api.Location;
 import edu.neumont.learningChess.api.MoveHistory;
+import edu.neumont.learningChess.api.PieceType;
 import edu.neumont.learningChess.controller.GameController;
 import edu.neumont.learningChess.controller.HistoryAnalyzer;
 import edu.neumont.learningChess.engine.persistence.PersistentGameStateCache;
@@ -15,6 +17,8 @@ import edu.neumont.learningChess.model.ChessPiece;
 import edu.neumont.learningChess.model.ICheckChecker;
 import edu.neumont.learningChess.model.Move;
 import edu.neumont.learningChess.model.MoveDescription;
+import edu.neumont.learningChess.model.Pawn;
+import edu.neumont.learningChess.model.ProxyPlayer;
 import edu.neumont.learningChess.model.SingletonRandom;
 import edu.neumont.learningChess.model.Team;
 public class LearningEngine implements HistoryAnalyzer {
@@ -88,14 +92,30 @@ public class LearningEngine implements HistoryAnalyzer {
 			persistence.put(current, toUpdate);
 		}
 	}
+	
+	private static ExtendedMove secondPawnPromotionMove = null;
 
 	private SearchResult findBestMove(GameController gameController) {
 		ArrayList<SearchResult> results = null;
 		float bestValue = 0;
 		ChessBoard board = gameController.getBoard();
-		for (Iterator<Move> i = gameController.getCurrentTeam().getMoves(board); i.hasNext();) {
-			ExtendedMove move = new ExtendedMove(i.next());
+		for (Iterator<Move> i = gameController.getCurrentTeam().getMoves(board); i.hasNext() || secondPawnPromotionMove != null;) {
+			ExtendedMove move = null;
+			if(secondPawnPromotionMove == null) {
+				Move next = i.next();
+				if(isPawnPromotion(next, gameController)) {
+					move = new ExtendedMove(next, PieceType.QUEEN);
+					secondPawnPromotionMove = new ExtendedMove(next, PieceType.KNIGHT);
+				} else {
+					move = new ExtendedMove(next);
+				}
+			} else {
+				move = secondPawnPromotionMove;
+				secondPawnPromotionMove = null;
+			}
+			((ProxyPlayer)gameController.getCurrentPlayer()).setPromotionPiece(move.getPromotionPieceType());
 			if(isLegalMove(move, board, gameController, gameController.getCurrentTeam())) {
+				
 				MoveDescription triedMove = board.tryMove(move);
 				float moveValue = getBoardValue(gameController);
 				board.undoTriedMove();
@@ -125,8 +145,19 @@ public class LearningEngine implements HistoryAnalyzer {
 		}
 	}
 	
+	private boolean isPawnPromotion(Move next, GameController gameController) {
+		return (gameController.getPiece(next.getFrom()) instanceof Pawn 
+				&& isPromotionRow(next.getTo()));
+	}
+
+	private boolean isPromotionRow(Location to) {
+		return to.getRow() == 7 || to.getRow() == 0;
+	}
+
 	public boolean isLegalMove(Move move, ChessBoard board,ICheckChecker checkChecker, Team team) {
 		ChessPiece movingPiece = board.getPiece(move.getFrom());
+		if(movingPiece == null)
+			System.out.println(move.getFrom());
 		Team movingTeam = movingPiece.getTeam();
 		return (movingTeam == team) && movingPiece.isLegalMove(board, move) && !causesCheckmate(move, checkChecker, board, team);
 	}
