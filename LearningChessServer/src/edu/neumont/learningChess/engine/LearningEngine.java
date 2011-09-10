@@ -66,12 +66,12 @@ public class LearningEngine implements HistoryAnalyzer {
 	
 	@Override
 	public void analyzeStack(Stack<ChessGameState> historyStack) {
-		int denominator = (int) Math.floor(historyStack.size() / 2.0);
+		float denominator = (float) Math.floor(historyStack.size() / 2.0);
 		boolean winner = false;
-		int count = denominator;
+		float count = denominator;
 		while (historyStack.size() > 1) {
 			ChessGameState current = historyStack.pop();
-			float value = count / denominator * (winner ? 1 : -1);
+			float value = count / denominator * (winner ? -1 : 1);
 			GameStateInfo toUpdate = persistence.get(current);
 			if (toUpdate == null)
 				toUpdate = new GameStateInfo(SerializedChessGameState.serialize(current));
@@ -117,7 +117,9 @@ public class LearningEngine implements HistoryAnalyzer {
 			if(isLegalMove(move, board, gameController, gameController.getCurrentTeam())) {
 				
 				MoveDescription triedMove = board.tryMove(move);
+				gameController.togglePlayers();
 				float moveValue = getBoardValue(gameController);
+				gameController.togglePlayers();
 				board.undoTriedMove();
 				if ((results == null) || (moveValue > bestValue)) {
 					move.setPromotionPieceType(GameController.getPieceTypeFromChessPiece(triedMove.getPromotionPiece()));
