@@ -29,6 +29,7 @@ public class LearningEngineTest extends TestCase {
 		boolean exceptionThrown = false;
 		try {
 			LearningEngine.create(FILENAME, 30);
+			LearningEngine.delete(FILENAME);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			exceptionThrown = true;
@@ -42,9 +43,13 @@ public class LearningEngineTest extends TestCase {
 
 		boolean exceptionThrown = false;
 		try {
+			LearningEngine.create(FILENAME, 30);
 			le = LearningEngine.open(FILENAME);
-
+			le.close();
+			LearningEngine.delete(FILENAME);
 		} catch (Throwable e) {
+			e.printStackTrace();
+
 			exceptionThrown = true;
 		}
 		assertFalse(exceptionThrown);
@@ -56,11 +61,20 @@ public class LearningEngineTest extends TestCase {
 
 		boolean exceptionThrown = false;
 		try {
+			LearningEngine.create(FILENAME, 30);
+			le = LearningEngine.open(FILENAME);
+
 			le.close();
+			LearningEngine.delete(FILENAME);
+
 
 		} catch (Throwable e) {
+			e.printStackTrace();
+
 			exceptionThrown = true;
 		}
+		
+		
 		assertFalse(exceptionThrown);
 
 	}
@@ -70,8 +84,10 @@ public class LearningEngineTest extends TestCase {
 		// deletes a file
 		boolean exceptionThrown = false;
 		try {
-			LearningEngine.delete(FILENAME);
+			LearningEngine.create("other", 30);
+			LearningEngine.delete("other");
 		} catch (Throwable e) {
+			e.printStackTrace();
 			exceptionThrown = true;
 		}
 		assertFalse(exceptionThrown);
@@ -96,12 +112,14 @@ public class LearningEngineTest extends TestCase {
 		ChessGameState cgs = Jsonizer.dejsonize(result, ChessGameState.class);
 		
 		//set up a learning engine
+		LearningEngine.create(FILENAME, 100);
 		LearningEngine eng = LearningEngine.open(FILENAME);
-		
 		Move m = eng.getMove(cgs);
 		System.out.println("Move to: ");
 		System.out.println("to="+m.getTo().toString());
-		System.out.println("from="+m.getTo().toString());
+		System.out.println("from="+m.getFrom().toString());
+		eng.close();
+		LearningEngine.delete(FILENAME);
 
 		
 	}
