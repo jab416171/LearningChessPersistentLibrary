@@ -2,21 +2,16 @@ package tests;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
-
-import com.sun.xml.internal.txw2.Document;
 
 import edu.neumont.learningChess.api.ChessGameState;
 import edu.neumont.learningChess.engine.LearningEngine;
 import edu.neumont.learningChess.json.Jsonizer;
 import edu.neumont.learningChess.model.Move;
-import junit.framework.TestCase;
 
 public class LearningEngineTest extends TestCase {
 

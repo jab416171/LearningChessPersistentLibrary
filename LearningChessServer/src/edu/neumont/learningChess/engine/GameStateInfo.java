@@ -44,5 +44,41 @@ public class GameStateInfo {
 	public float getCount() {
 		return count;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Float.floatToIntBits(average);
+		result = prime * result + Float.floatToIntBits(count);
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		GameStateInfo other = (GameStateInfo) obj;
+		if (Float.floatToIntBits(average) != Float.floatToIntBits(other.average)) {
+			return false;
+		}
+		if (Float.floatToIntBits(count) != Float.floatToIntBits(other.count)) {
+			return false;
+		}
+		return true;
+	}
 	
 }
