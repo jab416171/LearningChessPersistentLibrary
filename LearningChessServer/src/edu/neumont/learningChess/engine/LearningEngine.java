@@ -59,8 +59,13 @@ public class LearningEngine implements HistoryAnalyzer {
 
 	public int analyzeGameHistory(MoveHistory history) {
 		int size = history.getMoves().size();
-		GameController controller = new GameController(this, history);
-		controller.play();
+		final GameController controller = new GameController(this, history);
+		new Thread() {
+			@Override
+			public void run() {
+				controller.play();
+			}
+		}.start();
 		return size;
 	}
 	
@@ -84,7 +89,7 @@ public class LearningEngine implements HistoryAnalyzer {
 	}
 	
 	@Override
-	public void analyzeStaleStack(Stack<ChessGameState> historyStack) {
+	public synchronized void analyzeStaleStack(Stack<ChessGameState> historyStack) {
 		while (historyStack.size() > 1) {
 			ChessGameState current = historyStack.pop();
 			GameStateInfo toUpdate = persistence.get(current);
@@ -93,12 +98,12 @@ public class LearningEngine implements HistoryAnalyzer {
 		}
 	}
 	
-	private static ExtendedMove secondPawnPromotionMove = null;
 
 	private SearchResult findBestMove(GameController gameController) {
 		ArrayList<SearchResult> results = null;
 		float bestValue = 0;
 		ChessBoard board = gameController.getBoard();
+		ExtendedMove secondPawnPromotionMove = null;
 		for (Iterator<Move> i = gameController.getCurrentTeam().getMoves(board); i.hasNext() || secondPawnPromotionMove != null;) {
 			ExtendedMove move = null;
 			if(secondPawnPromotionMove == null) {
@@ -156,10 +161,11 @@ public class LearningEngine implements HistoryAnalyzer {
 		return to.getRow() == 7 || to.getRow() == 0;
 	}
 
-	public boolean isLegalMove(Move move, ChessBoard board,ICheckChecker checkChecker, Team team) {
+	private boolean isLegalMove(Move move, ChessBoard board,ICheckChecker checkChecker, Team team) {
 		ChessPiece movingPiece = board.getPiece(move.getFrom());
 		if(movingPiece == null)
-			System.out.println(move.getFrom());
+			throw new RuntimeException("Moving piece is null, move: " 
+		+ move.toString() + ", team: " + team.toString() + ", board: " + board.toString());
 		Team movingTeam = movingPiece.getTeam();
 		return (movingTeam == team) && movingPiece.isLegalMove(board, move) && !causesCheckmate(move, checkChecker, board, team);
 	}
