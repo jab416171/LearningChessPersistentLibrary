@@ -30,8 +30,8 @@ public class LearningEngine implements HistoryAnalyzer {
 	}
 
 	public static void create(String fileName, long maxListSize) {
-		final long recordSize = SerializedChessGameState.getRecordSize();
-		PersistentGameStateCache.create(fileName, recordSize, recordSize, maxListSize);
+		
+		PersistentGameStateCache.create(fileName, maxListSize);
 	}
 
 	public static void delete(String fileName) {
@@ -194,6 +194,10 @@ public class LearningEngine implements HistoryAnalyzer {
 		public ExtendedMove getMove() {
 			return move;
 		}
+	}
+	
+	public void initializeFiles() {
+		persistence.initializeFiles();
 	}
 
 }

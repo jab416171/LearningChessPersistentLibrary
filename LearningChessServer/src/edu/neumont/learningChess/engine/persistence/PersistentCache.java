@@ -22,7 +22,7 @@ public class PersistentCache {
 		}
 		PersistentCacheHeader header = new PersistentCacheHeader(cacheSize);
 		PersistentHashTable.create(getHashTableName(fileName), keySize, (long)(cacheSize * 1.3));
-		PersistentDoubleLinkList.create(getLinkedListName(fileName), valueSize, header.getSize());
+		PersistentDoubleLinkList.create(getLinkedListName(fileName), keySize + valueSize, header.getSize());
 		PersistentDoubleLinkList list = PersistentDoubleLinkList.open(getLinkedListName(fileName));
 		list.putHeader(header.serialize());
 		list.close();
@@ -46,25 +46,30 @@ public class PersistentCache {
 	}
 	
 	public void put(byte[] key, byte[] value) {
+		PersistentCacheNode node = new PersistentCacheNode(key, value);
 		long index = hashTable.get(key);
 		if(index >= 0) {
-			linkedList.update(index, value);
+			linkedList.update(index, node.serialize());
 			linkedList.moveToFront(index);
 		} else {
-			long newNodeIndex = linkedList.addToFront(value);
-			if(linkedList.getLength() > header.getCacheSize()) {
-				linkedList.removeFromBack();
+			if(linkedList.getLength() >= header.getCacheSize()) {
+				byte[] oldNodeBuffer = linkedList.removeFromBack();
+				PersistentCacheNode oldNode = new PersistentCacheNode(oldNodeBuffer,key.length);
+				hashTable.remove(oldNode.getKey());
 			}
+			long newNodeIndex = linkedList.addToFront(node.serialize());
 			hashTable.put(key, newNodeIndex);
 		}
 		
 	}
 	
 	public byte[] get(byte[] key) {
-		byte[] value = null;
 		long index = hashTable.get(key);
+		byte[] value = null;
 		if(index >= 0) {
-			value = linkedList.get(index);
+			byte[] buffer = linkedList.get(index);
+			PersistentCacheNode node = new PersistentCacheNode(buffer, key.length);
+			value = node.getValue();
 			linkedList.moveToFront(index);
 		}
 		return value;
@@ -91,5 +96,10 @@ public class PersistentCache {
 
 	public byte[] getHeader() {
 		return header.serialize();
+	}
+
+
+	public void initializeFiles() {
+		hashTable.initializeFiles();
 	}
 }

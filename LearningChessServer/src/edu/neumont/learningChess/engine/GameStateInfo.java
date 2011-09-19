@@ -80,5 +80,9 @@ public class GameStateInfo {
 		}
 		return true;
 	}
+
+	public static long getRecordSize() {
+		return FLOAT_SIZE * 2;
+	}
 	
 }

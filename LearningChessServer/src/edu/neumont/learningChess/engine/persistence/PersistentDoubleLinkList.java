@@ -48,15 +48,15 @@ public class PersistentDoubleLinkList {
 		persistentArrayFS.close();
 	}
 	
-	private void putLocalHeader() {
-		persistentArrayFS.putHeader(header.serialize());
+	private void readHeader() {
+		byte[] buffer = persistentArrayFS.getHeader();
+		header.deserialize(buffer);
 	}
-	
-	private void getLocalHeader() {
-		header.deserialize(persistentArrayFS.getHeader());
+
+	private void writeHeader() {
+		byte[] buffer = header.serialize();
+		persistentArrayFS.putHeader(buffer);
 	}
-	
-	
 	
 	public long getLength(){
 		return header.getListSize();
@@ -64,6 +64,8 @@ public class PersistentDoubleLinkList {
 	public byte[] get(long index){
 		return getNode(index).getData();
 	}
+	
+	
 	
 	public void putHeader(byte[] buffer){
 		header.setClientHeader(buffer);
@@ -73,15 +75,18 @@ public class PersistentDoubleLinkList {
 		return header.getClientHeader();
 	}
 	
-	public void removeFromBack(){
+	public byte[] removeFromBack(){
 		if(header.getListSize() <= 0)
 			throw new RuntimeException("Nothing to remove");
 		
 		PersistentDoubleLinkListNode listHead = getListHead();
 		long index = listHead.getFrontPointer();
-		removeNode(index);
+
+		PersistentDoubleLinkListNode removedNode = removeNode(index);
+		byte[] removedNodeBuffer = removedNode.getData();
 		persistentArrayFS.deallocate(index);
 		decrementListSize();
+		return removedNodeBuffer;
 	}
 
 	private PersistentDoubleLinkListNode removeNode(long index) {
@@ -170,16 +175,7 @@ public class PersistentDoubleLinkList {
 		header.decrementListSize();
 		writeHeader();
 	}
-	
-	private void readHeader() {
-		byte[] buffer = persistentArrayFS.getHeader();
-		header.deserialize(buffer);
-	}
 
-	private void writeHeader() {
-		byte[] buffer = header.serialize();
-		persistentArrayFS.putHeader(buffer);
-	}
 	
 	public void printFile(PrintStream printStream){
 		persistentArrayFS.printFile(printStream);

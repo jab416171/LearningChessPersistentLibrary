@@ -89,6 +89,8 @@ public class PersistentHashTable {
 		
 		for(;;) {
 			index++;
+			if(index >= hashSize)
+				index = 0;
 			byte[] current = persistentArray.get(index);
 			if(isEmpty(current))
 				break;
@@ -142,7 +144,7 @@ public class PersistentHashTable {
 			if (location != null) break;
 
 			index++;
-			if (index > hashSize) index = 0;
+			if (index >= hashSize) index = 0;
 			if (startingLocation == index) {
 				throw new RuntimeException("The HashTable is too full");
 			}
@@ -158,6 +160,10 @@ public class PersistentHashTable {
 			location = index;
 		}
 		return location;
+	}
+	
+	public void initializeFiles() {
+		persistentArray.initializeFiles(hashSize * recordSize);
 	}
 
 	private class HashEntry{
@@ -187,5 +193,5 @@ public class PersistentHashTable {
 			byteBuffer.get(key, 0, byteBuffer.remaining());
 		}
 	}
-	
+
 }

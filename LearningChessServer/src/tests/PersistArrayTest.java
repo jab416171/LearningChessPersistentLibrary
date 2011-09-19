@@ -157,7 +157,7 @@ public class PersistArrayTest extends TestCase {
 		catch (Throwable e) {
 			exceptionOccured = true;
 		}
-		assertTrue(exceptionOccured);
+		assertFalse(exceptionOccured);
 		clearContents();
 	}
 
@@ -180,6 +180,7 @@ public class PersistArrayTest extends TestCase {
 		}
 		catch (Throwable e) {
 			exceptionOccured = true;
+			e.printStackTrace();
 		}
 		assertFalse(exceptionOccured);
 		
@@ -281,6 +282,7 @@ public class PersistArrayTest extends TestCase {
 		}
 		catch (Throwable e) {
 			exceptionOccured = true;
+			e.printStackTrace();
 		}
 		assertFalse(exceptionOccured);
 		exceptionOccured = false;

@@ -6,14 +6,16 @@ import edu.neumont.learningChess.engine.SerializedChessGameState;
 
 public class PersistentGameStateCache {
 	private PersistentCache cache;
+	public static final long KEY_SIZE = SerializedChessGameState.getRecordSize();
+	public static final long VALUE_SIZE = GameStateInfo.getRecordSize();
 	
 	private PersistentGameStateCache(String fileName) {
 		this.cache = PersistentCache.open(fileName);
 	}
 	
-	public static void create(String fileName, long keySize, long valueSize, long recordSize) {
+	public synchronized static void create(String fileName, long recordSize) {
 		try {
-			PersistentCache.create(fileName, keySize, valueSize, recordSize);
+			PersistentCache.create(fileName, KEY_SIZE, VALUE_SIZE, recordSize);
 			PersistentCache array = PersistentCache.open(fileName);
 			array.close();
 		} catch (Throwable e) {
@@ -21,30 +23,34 @@ public class PersistentGameStateCache {
 		}
 	}
 	
-	public static void delete(String fileName) {
+	public synchronized static void delete(String fileName) {
 		PersistentCache.delete(fileName);
 	}
 	
-	public static PersistentGameStateCache open(String fileName) {
+	public synchronized static PersistentGameStateCache open(String fileName) {
 		PersistentGameStateCache tempCache = new PersistentGameStateCache(fileName);
 		return tempCache;
 	}
 	
-	public void close() {
+	public synchronized void close() {
 		cache.close();
 	}
 	
-	public void put(ChessGameState key, GameStateInfo value) {
+	public synchronized void put(ChessGameState key, GameStateInfo value) {
 		cache.put(serialize(key), value.serialize());
 	}
 	
-	public GameStateInfo get(ChessGameState key) {
-		if(cache.get(serialize(key)) == null)
-			return new GameStateInfo(0,0);
-		return new GameStateInfo(cache.get(serialize(key)));
+	public synchronized GameStateInfo get(ChessGameState key) {
+		byte[] cacheBuffer = cache.get(serialize(key));
+		return cacheBuffer == null ? 
+				new GameStateInfo(0,0) : new GameStateInfo(cacheBuffer);
 	}
 	
 	private byte[] serialize(ChessGameState game) {
 		return SerializedChessGameState.serialize(game);
+	}
+
+	public void initializeFiles() {
+		cache.initializeFiles();
 	}
 }
