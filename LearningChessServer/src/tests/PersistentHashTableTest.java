@@ -37,16 +37,6 @@ public class PersistentHashTableTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			PersistentHashTable.create(FILENAME, Long.MAX_VALUE, Long.MAX_VALUE);
-		}
-		catch(Throwable e){
-			exceptionOccured = true;
-		}
-		assertTrue(exceptionOccured);
-
-		
-		exceptionOccured = false;
-		try{
 			PersistentHashTable.create(FILENAME, 10000, 10000);
 		}
 		catch(Throwable e){
@@ -66,7 +56,7 @@ public class PersistentHashTableTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			PersistentHashTable.create(FILENAME, -1, Long.MAX_VALUE);
+			PersistentHashTable.create(FILENAME, -1, 1000);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -75,7 +65,7 @@ public class PersistentHashTableTest extends TestCase {
 		
 		exceptionOccured = false;
 		try{
-			PersistentHashTable.create(FILENAME, Long.MIN_VALUE, Long.MIN_VALUE);
+			PersistentHashTable.create(FILENAME, 1000, Long.MIN_VALUE);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -84,7 +74,7 @@ public class PersistentHashTableTest extends TestCase {
 
 		exceptionOccured = false;
 		try{
-			PersistentHashTable.create(FILENAME, Long.MAX_VALUE, -1);
+			PersistentHashTable.create(FILENAME, 1000, -1);
 		}
 		catch(Throwable e){
 			exceptionOccured = true;
@@ -120,15 +110,6 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		
-		exceptionOccured = false;
-		try{
-			PersistentHashTable.delete(FILENAME);
-		}
-		catch(Throwable e){
-			exceptionOccured = true;
-		}
-		assertTrue(exceptionOccured);
 		
 		exceptionOccured = false;
 		try{
@@ -236,7 +217,7 @@ public class PersistentHashTableTest extends TestCase {
 			exceptionOccured = true;
 		}
 		assertFalse(exceptionOccured);
-		assertTrue(value == 11);
+		assertEquals(value,11);
 		
 		
 		exceptionOccured = false;

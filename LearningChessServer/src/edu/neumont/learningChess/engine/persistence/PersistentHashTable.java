@@ -14,7 +14,6 @@ public class PersistentHashTable {
 	 * 
 	 */
 	private PersistentArray persistentArray;
-	private static final long INFO_SIZE = 8;
 	private static final int BYTES_IN_A_LONG = 8;
 	private static final int BITS_IN_A_BYTE = 8;
 	
@@ -31,9 +30,10 @@ public class PersistentHashTable {
 	public static void create(String fileName, long keyLength, long tableLength){
 		if(keyLength <= 0)
 			throw new RuntimeException("Record size must be positive");
-			
+		if(tableLength <= 0)
+			throw new RuntimeException("Table length must be positive");
 		try {
-			PersistentArray.create(fileName, keyLength+INFO_SIZE, BYTES_IN_A_LONG);
+			PersistentArray.create(fileName, keyLength+BYTES_IN_A_LONG, BYTES_IN_A_LONG);
 			PersistentArray array = PersistentArray.open(fileName);
 			array.putHeader(new PersistentHashTableHeader(tableLength).serialize());
 			array.close();
@@ -189,7 +189,7 @@ public class PersistentHashTable {
 		public void deserialize(byte[] buffer) {
 			ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 			value = byteBuffer.getLong();
-			key = new byte[(int) (recordSize-INFO_SIZE)];
+			key = new byte[(int) (recordSize-BYTES_IN_A_LONG)];
 			byteBuffer.get(key, 0, byteBuffer.remaining());
 		}
 	}

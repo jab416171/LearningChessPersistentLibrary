@@ -114,7 +114,7 @@ public class PersistentArray {
 	
 	public void initializeFiles(long maxSize) {
 		long offset = getOffset(0);
-		final long CHUNK_SIZE = 100000000L;
+		final long CHUNK_SIZE = Math.min(maxSize, 100000000);
 		bigFile.seek(offset);
 		for (long i = maxSize; i > 0; i-= Math.max(maxSize % CHUNK_SIZE, CHUNK_SIZE)) {
 			bigFile.write(new byte[(int) maxSize]);
